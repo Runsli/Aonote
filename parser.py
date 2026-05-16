@@ -5,10 +5,70 @@ import re
 import yaml
 import markdown
 from datetime import datetime, date
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, Optional
 import config 
 import unicodedata 
 from bs4 import BeautifulSoup # 引入 BeautifulSoup
+
+
+def _read_image_dimensions(image_path: str) -> Optional[Tuple[int, int]]:
+    """用标准库读取常见图片尺寸，避免为懒加载图片引入布局偏移。"""
+    try:
+        with open(image_path, 'rb') as f:
+            header = f.read(32)
+
+            if header.startswith(b'\x89PNG\r\n\x1a\n') and len(header) >= 24:
+                return int.from_bytes(header[16:20], 'big'), int.from_bytes(header[20:24], 'big')
+
+            if header[:6] in (b'GIF87a', b'GIF89a') and len(header) >= 10:
+                return int.from_bytes(header[6:8], 'little'), int.from_bytes(header[8:10], 'little')
+
+            if header.startswith(b'\xff\xd8'):
+                f.seek(2)
+                while True:
+                    marker_start = f.read(1)
+                    if not marker_start:
+                        return None
+                    if marker_start != b'\xff':
+                        continue
+
+                    marker = f.read(1)
+                    while marker == b'\xff':
+                        marker = f.read(1)
+                    if not marker:
+                        return None
+
+                    if marker in (b'\xc0', b'\xc1', b'\xc2', b'\xc3', b'\xc5', b'\xc6', b'\xc7', b'\xc9', b'\xca', b'\xcb', b'\xcd', b'\xce', b'\xcf'):
+                        segment = f.read(7)
+                        if len(segment) < 7:
+                            return None
+                        return int.from_bytes(segment[5:7], 'big'), int.from_bytes(segment[3:5], 'big')
+
+                    length_bytes = f.read(2)
+                    if len(length_bytes) < 2:
+                        return None
+                    segment_length = int.from_bytes(length_bytes, 'big')
+                    if segment_length < 2:
+                        return None
+                    f.seek(segment_length - 2, os.SEEK_CUR)
+    except OSError:
+        return None
+
+    return None
+
+
+def _resolve_local_image_path(src: str, md_file_path: str) -> Optional[str]:
+    """将 Markdown 图片 src 解析为本地文件路径；外链不处理。"""
+    if not src or src.startswith(('http://', 'https://', '//', 'data:')):
+        return None
+
+    project_root = os.path.dirname(__file__)
+    if src.startswith('/'):
+        candidate = os.path.join(project_root, src.lstrip('/'))
+    else:
+        candidate = os.path.join(os.path.dirname(md_file_path), src)
+
+    return candidate if os.path.isfile(candidate) else None
 
 # 辅助函数 - 将日期时间对象标准化为日期对象
 def standardize_date(dt_obj: Any) -> date:
@@ -159,6 +219,16 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
             # 只有当图片没有明确的 'loading' 属性时才添加 'lazy'
             if not img.get('loading'):
                 img['loading'] = 'lazy'
+            if not img.get('decoding'):
+                img['decoding'] = 'async'
+            if not img.get('width') or not img.get('height'):
+                local_image_path = _resolve_local_image_path(img.get('src', ''), md_file_path)
+                if local_image_path:
+                    dimensions = _read_image_dimensions(local_image_path)
+                    if dimensions:
+                        width, height = dimensions
+                        img.setdefault('width', str(width))
+                        img.setdefault('height', str(height))
 
         # 2. 表格包裹器 (Table Wrapper)
         for table in soup.find_all('table'):
@@ -172,7 +242,7 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
                 continue
 
             # 创建新的 div 容器
-            wrapper_div = soup.new_tag('div', class_='table-wrapper')
+            wrapper_div = soup.new_tag('div', attrs={'class': 'table-wrapper'})
             
             # 将 table 替换为 wrapper_div
             table.replace_with(wrapper_div)

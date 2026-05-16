@@ -122,35 +122,17 @@ body {
 
 a {
     color: var(--color-primary);
-    text-decoration: none;
-    transition: color 0.2s;
-    position: relative;
-    display: inline-block;
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: color 0.2s, text-decoration-color 0.2s;
     outline: none;
-}
-
-/* --- 链接下划线动画优化 --- */
-a::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    transform: scaleX(0);
-    height: 1px;
-    bottom: -2px;
-    /* 下划线稍微远离文字 */
-    left: 0;
-    background-color: var(--color-primary);
-    transform-origin: bottom right;
-    transition: transform 0.3s ease-out;
 }
 
 a:hover {
     color: #004d40;
-}
-
-a:hover::after {
-    transform: scaleX(1);
-    transform-origin: bottom left;
+    text-decoration-color: currentColor;
 }
 
 a:focus {
@@ -168,22 +150,18 @@ a:focus {
         color: #b2dfdb;
     }
 
-    a::after {
-        background-color: var(--color-link-dark);
-    }
 }
 
-/* 例外处理 */
-header nav a::after,
-.post-license a::after,
-.post-content h1 a::after,
-.post-content h2 a::after,
-.post-content h3 a::after,
-.tag-badge a::after,
-.button a::after,
-.button-secondary a::after,
-.archive-link::after {
-    content: none;
+header nav a,
+.site-title,
+.post-list-item,
+.tag-badge,
+.button,
+.button-secondary,
+.archive-link,
+.nav-link,
+.footer-content a {
+    text-decoration: none;
 }
 
 h1,
@@ -518,11 +496,7 @@ main {
     letter-spacing: 0.005em;
     line-height: 1.75;
     margin-bottom: 1.6em;
-    text-align: justify;
-    text-justify: inter-word;
-    hyphens: auto;
-    -webkit-hyphens: auto;
-    -ms-hyphens: auto;
+    text-align: start;
     text-rendering: optimizeLegibility;
 }
 
@@ -2757,5 +2731,17 @@ html {
     display: block;
     height: 90px;
     visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 /* --- END OF FILE style.css --- */

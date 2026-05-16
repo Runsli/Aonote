@@ -498,10 +498,8 @@ def build_site():
 
         if metadata_changed and not needs_full_build:
             print(f"   -> [METADATA CHANGED] {os.path.basename(md_file)}")
-            posts_data_changed = True
 
-        # 如果元数据变化或内容变化，都需要重建列表页
-        if needs_rebuild_list and not needs_full_build:
+        if needs_rebuild_list:
             posts_data_changed = True
         
         # 清理旧的 HTML 文件 (如果 Slug 变化)

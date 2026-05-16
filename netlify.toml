@@ -2,7 +2,13 @@
   command = "python autobuild.py"
   publish = "_site"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# 静态博客：未命中路径由 Netlify 自动回退到根目录的 404.html (HTTP 404)
+# 不要使用 SPA 风格的 /* -> /index.html (status=200)，那会让 404.html 永远不生效，
+# 并使搜索引擎把所有错误路径当成"软 404"的首页副本，伤 SEO。
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Content-Type-Options = "nosniff"

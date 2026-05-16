@@ -103,31 +103,62 @@ def process_posts_for_template(posts: List[Dict[str, Any]]) -> List[Dict[str, An
 
 # --- 核心生成函数 ---
 
+def _static_asset_exists(relative_name: str) -> bool:
+    """检查源 static 目录下的资源文件是否真实存在。
+
+    避免 JSON-LD 输出指向 404 的图片 URL（Google Rich Results 会因此降权）。
+    """
+    candidate = os.path.join(os.path.dirname(__file__), config.STATIC_DIR, relative_name)
+    return os.path.isfile(candidate)
+
+
+def _site_relative_asset_exists(url_path: str) -> bool:
+    """检查站点根相对路径（如 /logo.png 或 /static/x.png）在构建产物中是否存在。
+
+    JSON-LD 输出前用它过滤掉 Markdown 中纯演示性质的 404 图片引用，
+    防止结构化数据校验失败或被搜索引擎降权。
+    """
+    rel = url_path.lstrip('/')
+    if not rel:
+        return False
+    project_root = os.path.dirname(__file__)
+    candidates = [
+        os.path.join(project_root, config.BUILD_DIR, rel),
+        os.path.join(project_root, rel),
+    ]
+    return any(os.path.isfile(p) for p in candidates)
+
+
 def get_json_ld_schema(post: Dict[str, Any]) -> str:
-    """生成 Article 类型的 JSON-LD 结构化数据。"""
+    """生成 Article 类型的 JSON-LD 结构化数据。
+
+    image / publisher.logo 仅在对应静态资源存在时输出，缺失时整字段省略，
+    防止结构化数据指向不存在的 URL。
+    """
     base_url = config.BASE_URL.rstrip('/')
-    image_url = f"{base_url}{config.SITE_ROOT}/static/default-cover.png"
-    
+    site_root = get_site_root_prefix()
+
+    image_url: Optional[str] = None
     soup = BeautifulSoup(post['content_html'], 'html.parser')
     img_tag = soup.find('img')
-    
-    if img_tag and 'src' in img_tag.attrs:
-        relative_path = img_tag['src'].lstrip('/')
-        if not relative_path.startswith(('http', '//')):
-            site_root = get_site_root_prefix()
+
+    if img_tag and img_tag.get('src'):
+        src = img_tag['src'].strip()
+        if src.startswith(('http://', 'https://', '//')):
+            image_url = src
+        elif _site_relative_asset_exists(src):
+            relative_path = src.lstrip('/')
             image_url = f"{base_url}{site_root}/{relative_path}"
-            image_url = image_url.replace('//', '/')
-            image_url = image_url.replace(':/', '://')
-        else:
-            image_url = relative_path
-    
-    schema = {
+
+    if image_url is None and _static_asset_exists('default-cover.png'):
+        image_url = f"{base_url}{site_root}/static/default-cover.png"
+
+    schema: Dict[str, Any] = {
         "@context": "https://schema.org",
         "@type": "Article",
         "headline": post['title'],
-        "image": image_url,
         "datePublished": post['date'].isoformat(),
-        "dateModified": post['date'].isoformat(), 
+        "dateModified": post['date'].isoformat(),
         "author": {
             "@type": "Person",
             "name": config.BLOG_AUTHOR
@@ -135,10 +166,6 @@ def get_json_ld_schema(post: Dict[str, Any]) -> str:
         "publisher": {
             "@type": "Organization",
             "name": config.BLOG_TITLE,
-            "logo": {
-                "@type": "ImageObject",
-                "url": f"{base_url}{get_site_root_prefix()}/static/logo.png" 
-            }
         },
         "description": post.get('excerpt', config.BLOG_DESCRIPTION),
         "mainEntityOfPage": {
@@ -146,6 +173,16 @@ def get_json_ld_schema(post: Dict[str, Any]) -> str:
             "url": f"{base_url}{make_internal_url(post['link'])}"
         }
     }
+
+    if image_url:
+        schema["image"] = image_url
+
+    if _static_asset_exists('logo.png'):
+        schema["publisher"]["logo"] = {
+            "@type": "ImageObject",
+            "url": f"{base_url}{site_root}/static/logo.png"
+        }
+
     return json.dumps(schema, ensure_ascii=False, indent=4)
 
 def generate_index_html(sorted_posts: List[Dict[str, Any]], build_time_info: str):
@@ -472,7 +509,6 @@ def generate_post_page(post: Dict[str, Any]):
         template = env.get_template('base.html')
         processed_list = process_posts_for_template([post])
         current_post_processed = processed_list[0]
-        json_ld_schema = get_json_ld_schema(post)
 
         # 版权相关函数
         def get_copyright_notice(title, author, url):
@@ -512,6 +548,7 @@ def generate_post_page(post: Dict[str, Any]):
             'content_html': post['content_html'],
             'post': current_post_processed,
             'post_date': post.get('date_formatted', ''),
+            'post_date_iso': post['date'].isoformat() if post.get('date') else '',
             'post_tags': current_post_processed.get('tags', []),
             'toc_html': post.get('toc_html'),
             'prev_post_nav': current_post_processed.get('prev_post_nav'),
@@ -523,7 +560,6 @@ def generate_post_page(post: Dict[str, Any]):
             'footer_time_info': post.get('footer_time_info', ''),
             'footer_content_type': config.FOOTER_CONTENT_TYPE,
             'footer_custom_text': config.FOOTER_CUSTOM_TEXT,
-            'json_ld_schema': json_ld_schema,
             # 版权相关
             'copyright_notice': get_copyright_notice,
             'copyright_format': get_copyright_format,

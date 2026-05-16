@@ -7,15 +7,28 @@
     <title>{{page_title}} - {{blog_title}}</title>
     <meta name="description" content="{{blog_description}}">
     <meta name="author" content="{{blog_author}}">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#00796b" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
+    {% if page_id == '404' %}
+    <meta name="robots" content="noindex">
+    {% else %}
     <link rel="canonical" href="{{canonical_url}}">
+    {% endif %}
+    <meta property="og:type" content="{% if page_id == 'post' %}article{% else %}website{% endif %}">
+    <meta property="og:title" content="{{page_title}} - {{blog_title}}">
+    <meta property="og:description" content="{{blog_description}}">
+    <meta property="og:url" content="{{canonical_url}}">
+    <meta property="og:site_name" content="{{blog_title}}">
+    {% if page_id == 'post' and post_date_iso %}
+    <meta property="article:published_time" content="{{post_date_iso}}">
+    <meta property="article:modified_time" content="{{post_date_iso}}">
+    {% endif %}
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{page_title}} - {{blog_title}}">
+    <meta name="twitter:description" content="{{blog_description}}">
     <link rel="stylesheet" href="{{site_root}}/assets/{{css_filename}}">
     <link rel="alternate" type="application/rss+xml" title="{{blog_title}} RSS Feed" href="{{site_root}}/rss.xml">
-
-    {%- if json_ld_schema -%}
-    <script type="application/ld+json">
-    {{ json_ld_schema | safe }}
-    </script>
-    {%- endif -%}
 
 </head>
 
@@ -38,14 +51,21 @@
     <main id="main-content">
         <div class="main-layout">
             <div class="content-area">
+                {%- if page_id == 'post' -%}
+                <article class="post-article" itemscope itemtype="https://schema.org/Article">
+                    <link itemprop="mainEntityOfPage" href="{{canonical_url}}">
+                    <meta itemprop="description" content="{{blog_description}}">
+                    <meta itemprop="author" content="{{blog_author}}">
+                    <meta itemprop="publisher" content="{{blog_title}}">
+                {%- endif -%}
                 <div class="page-header">
                     {%- if page_id == 'post' -%}
-                    <h1>{{post.title}}</h1>
+                    <h1 itemprop="headline">{{post.title}}</h1>
                     <div class="post-meta">
                         <div class="meta-container">
-                            <span class="meta-date">
+                            <time class="meta-date" datetime="{{post_date_iso}}" itemprop="datePublished dateModified">
                                 {{post_date}}
-                            </span>
+                            </time>
 
                             {% if post_tags %}
                             <div class="meta-tags">
@@ -126,9 +146,15 @@
 
                 {# --- 正文/归档/标签云内容渲染区 --- #}
                 {%- if content_html -%}
+                {%- if page_id == 'post' -%}
+                <div class="post-content" itemprop="articleBody">
+                    {{content_html | safe}}
+                </div>
+                {%- else -%}
                 <div class="post-content">
                     {{content_html | safe}}
                 </div>
+                {%- endif -%}
                 {%- endif -%}
 
 <!-- 版权声明 -->
@@ -221,6 +247,10 @@
                     <div class="nav-link-placeholder"></div>
                     {% endif %}
                 </nav>
+                {%- endif -%}
+
+                {%- if page_id == 'post' -%}
+                </article>
                 {%- endif -%}
 
             </div>
