@@ -462,6 +462,9 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
                 continue
 
             pre['data-lang'] = language_label
+            parent = pre.parent
+            if parent and 'highlight' in parent.get('class', []):
+                parent['data-lang'] = language_label
             code = pre.find('code')
             if code:
                 code_classes = code.get('class', [])

@@ -762,6 +762,10 @@ main {
 }
 
 /* --- [优化] 代码块 字体与抗锯齿优化 --- */
+.post-content .highlight {
+    position: relative;
+}
+
 .post-content pre {
     font-family: var(--font-mono);
     -webkit-font-smoothing: antialiased;
@@ -789,8 +793,12 @@ main {
     content: none;
 }
 
-/* 右上角显示语言 (默认 CODE) */
 .post-content pre::after {
+    content: none;
+}
+
+/* 右上角显示语言，固定在外层容器，不随横向滚动移动 */
+.post-content .highlight::after {
     content: none;
     position: absolute;
     top: 7px;
@@ -804,45 +812,45 @@ main {
     letter-spacing: 0.05em;
 }
 
-.post-content pre[data-lang]::after {
+.post-content .highlight[data-lang]::after {
     content: attr(data-lang);
 }
 
 /* 使用 :has() 根据 code class 显示具体语言 */
-.post-content pre:has(code[class*="python"])::after,
-.post-content pre:has(code[class*="language-python"])::after {
+.post-content .highlight:has(code[class*="python"])::after,
+.post-content .highlight:has(code[class*="language-python"])::after {
     content: "PYTHON";
 }
 
-.post-content pre:has(code[class*="js"])::after,
-.post-content pre:has(code[class*="javascript"])::after,
-.post-content pre:has(code[class*="language-javascript"])::after {
+.post-content .highlight:has(code[class*="js"])::after,
+.post-content .highlight:has(code[class*="javascript"])::after,
+.post-content .highlight:has(code[class*="language-javascript"])::after {
     content: "JS";
 }
 
-.post-content pre:has(code[class*="css"])::after,
-.post-content pre:has(code[class*="language-css"])::after {
+.post-content .highlight:has(code[class*="css"])::after,
+.post-content .highlight:has(code[class*="language-css"])::after {
     content: "CSS";
 }
 
-.post-content pre:has(code[class*="html"])::after,
-.post-content pre:has(code[class*="language-html"])::after {
+.post-content .highlight:has(code[class*="html"])::after,
+.post-content .highlight:has(code[class*="language-html"])::after {
     content: "HTML";
 }
 
-.post-content pre:has(code[class*="bash"])::after,
-.post-content pre:has(code[class*="shell"])::after,
-.post-content pre:has(code[class*="language-bash"])::after {
+.post-content .highlight:has(code[class*="bash"])::after,
+.post-content .highlight:has(code[class*="shell"])::after,
+.post-content .highlight:has(code[class*="language-bash"])::after {
     content: "SHELL";
 }
 
-.post-content pre:has(code[class*="json"])::after,
-.post-content pre:has(code[class*="language-json"])::after {
+.post-content .highlight:has(code[class*="json"])::after,
+.post-content .highlight:has(code[class*="language-json"])::after {
     content: "JSON";
 }
 
-.post-content pre:has(code[class*="sql"])::after,
-.post-content pre:has(code[class*="language-sql"])::after {
+.post-content .highlight:has(code[class*="sql"])::after,
+.post-content .highlight:has(code[class*="language-sql"])::after {
     content: "SQL";
 }
 
