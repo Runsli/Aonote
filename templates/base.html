@@ -132,6 +132,14 @@
                         {% endif %}
 
                     </article>
+                    {% else %}
+                    <p class="empty-state">
+                        {%- if page_id == 'tag' -%}
+                        这个标签下还没有文章。
+                        {%- else -%}
+                        还没有发布文章。
+                        {%- endif -%}
+                    </p>
                     {% endfor %}
                 </div>
                 {%- endif -%}
@@ -268,13 +276,6 @@
         <div class="footer-content">
             <div class="footer-left">
                 <span class="copyright-info">&copy; {{current_year}} {{blog_author}}.</span>
-                {%- if footer_content_type == 'build_time' -%}
-                <span class="build-info">{{footer_time_info}}</span>
-                {%- elif footer_content_type == 'custom' -%}
-                <span class="custom-footer-text">{{footer_custom_text}}</span>
-                {%- elif footer_content_type == 'empty' -%}
-                <!-- 空内容，不显示任何内容 -->
-                {%- endif -%}
             </div>
             <div class="footer-right">
                 <a href="{{site_root}}/rss.xml">RSS 订阅</a>

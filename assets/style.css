@@ -731,8 +731,7 @@ main {
     overflow-x: auto;
     font-size: 0.9rem;
     border: 1px solid var(--color-main-border);
-    transition: box-shadow 0.2s, background-color 0.2s;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s, border-color 0.2s;
     background-color: var(--color-code-bg);
 
     background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 0%, rgba(0, 0, 0, 0.035) 28px, transparent 28px);
@@ -743,7 +742,6 @@ main {
 @media (prefers-color-scheme: dark) {
     .post-content pre {
         background-color: var(--color-code-bg-dark);
-        box-shadow: 0 4px 6px -1px rgba(255, 255, 255, 0.05);
         background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.035) 28px, transparent 28px);
     }
 }
@@ -811,13 +809,7 @@ main {
 }
 
 .post-content pre:hover {
-    box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.1);
-}
-
-@media (prefers-color-scheme: dark) {
-    .post-content pre:hover {
-        box-shadow: 0 6px 12px -2px rgba(255, 255, 255, 0.1);
-    }
+    border-color: var(--color-primary-light);
 }
 
 /* --- 表格 UI/UX (表头冻结) --- */
@@ -1304,6 +1296,31 @@ main {
     margin: 0 0 var(--space-lg);
 }
 
+.tag-meta-info .button-secondary.button-small {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-main-subtext);
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+
+.tag-meta-info .button-secondary.button-small:hover {
+    color: var(--color-primary);
+    text-decoration-line: underline;
+    text-decoration-color: currentColor;
+}
+
+.empty-state {
+    color: var(--color-main-subtext);
+    margin: var(--space-xl) 0;
+    padding: var(--space-xl);
+    border: 1px dashed var(--color-main-border);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.015);
+}
+
 .section-divider {
     border: 0;
     border-top: 1px solid var(--color-main-border);
@@ -1334,6 +1351,14 @@ main {
 }
 
 @media (prefers-color-scheme: dark) {
+    .tag-meta-info .button-secondary.button-small:hover {
+        color: var(--color-link-dark);
+    }
+
+    .empty-state {
+        background-color: rgba(255, 255, 255, 0.02);
+    }
+
     .tag-cloud-item:hover {
         background-color: rgba(255, 255, 255, 0.05);
     }
@@ -1632,23 +1657,25 @@ button:focus,
    ========================================= */
 @media (max-width: 900px) {
     .header-inner {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-        padding: 0 20px;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        padding: 0 var(--space-md);
     }
 
     header nav {
         display: flex;
         flex-wrap: wrap;
-        margin-left: 0;
-        width: 100%;
+        justify-content: flex-end;
+        gap: var(--space-xs) var(--space-md);
+        margin-left: auto;
     }
 
     header nav a {
         margin-left: 0;
-        margin-right: 20px;
-        padding: 5px 0;
+        margin-right: 0;
+        padding: var(--space-xs) 0;
+        line-height: 1.4;
     }
 
     .main-layout {
@@ -1688,6 +1715,22 @@ button:focus,
 
     .post-list-item {
         padding: var(--space-lg) var(--space-md);
+    }
+}
+
+@media (max-width: 600px) {
+    header {
+        padding: var(--space-md) 0;
+    }
+
+    .header-inner {
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+
+    header nav {
+        justify-content: flex-start;
+        width: 100%;
     }
 }
 

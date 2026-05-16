@@ -234,24 +234,26 @@ def generate_archive_html(sorted_posts: List[Dict[str, Any]], build_time_info: s
 
         template = env.get_template('base.html')
         
-        # --- UI 重构: 自定义归档列表样式 ---
         archive_html = "<div class=\"archive-page\">\n"
-        
-        for year, posts in sorted_archive:
-            archive_html += f"<h2 class=\"archive-year\">{year} <small>({len(posts)})</small></h2>\n"
-            archive_html += "<ul class=\"archive-list\">\n"
+
+        if not sorted_archive:
+            archive_html += "<p class=\"empty-state\">还没有可归档的文章。</p>\n"
+        else:
+            for year, posts in sorted_archive:
+                archive_html += f"<h2 class=\"archive-year\">{year} <small>({len(posts)})</small></h2>\n"
+                archive_html += "<ul class=\"archive-list\">\n"
             
-            for post in posts:
-                link = make_internal_url(post['link']) 
-                date_str = post['date'].strftime('%m-%d')
+                for post in posts:
+                    link = make_internal_url(post['link']) 
+                    date_str = post['date'].strftime('%m-%d')
                 
-                archive_html += f"""
-                <li class="archive-item">
-                    <span class="archive-date">{date_str}</span>
-                    <a class="archive-link" href="{link}">{post['title']}</a>
-                </li>
-                """
-            archive_html += "</ul>\n"
+                    archive_html += f"""
+                    <li class="archive-item">
+                        <span class="archive-date">{date_str}</span>
+                        <a class="archive-link" href="{link}">{post['title']}</a>
+                    </li>
+                    """
+                archive_html += "</ul>\n"
             
         archive_html += "</div>"
             
@@ -289,13 +291,15 @@ def generate_tags_list_html(tag_map: Dict[str, List[Dict[str, Any]]], build_time
         
         sorted_tags = sorted(tag_map.items(), key=lambda item: len(item[1]), reverse=True)
         tags_html = "<h1>标签列表</h1>\n<div class=\"tag-cloud\">\n"
-        
-        for tag, posts in sorted_tags:
-            tag_slug = tag_to_slug(tag)
-            link = make_internal_url(f"{config.TAGS_DIR_NAME}/{tag_slug}")
-            count = len(posts)
-            font_size = max(1.0, min(2.5, 0.8 + count * 0.15))
-            tags_html += f"<a href=\"{link}\" style=\"font-size: {font_size}rem;\" class=\"tag-cloud-item\">{tag} ({count})</a>\n"
+
+        if not sorted_tags:
+            tags_html += "<p class=\"empty-state\">还没有任何标签。</p>\n"
+        else:
+            for tag, posts in sorted_tags:
+                tag_slug = tag_to_slug(tag)
+                link = make_internal_url(f"{config.TAGS_DIR_NAME}/{tag_slug}")
+                count = len(posts)
+                tags_html += f"<a href=\"{link}\" class=\"tag-cloud-item\">{tag} ({count})</a>\n"
         tags_html += "</div>\n"
 
         template = env.get_template('base.html')
