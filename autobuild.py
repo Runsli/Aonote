@@ -640,6 +640,7 @@ def build_site():
         generator.generate_index_html(final_parsed_posts, global_build_time_cn) 
         generator.generate_archive_html(final_parsed_posts, global_build_time_cn) 
         generator.generate_tags_list_html(tag_map, global_build_time_cn) 
+        generator.generate_feed_html(final_parsed_posts, global_build_time_cn)
 
         for tag, posts in tag_map.items():
             sorted_tag = sorted(posts, key=post_sort_key, reverse=True)

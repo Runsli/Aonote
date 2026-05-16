@@ -725,24 +725,19 @@ main {
     text-rendering: optimizeLegibility;
 
     position: relative;
-    padding: 36px 15px 15px 15px;
+    padding: 28px 15px 15px 15px;
     border-radius: var(--radius-md);
     margin: 25px 0;
     overflow-x: auto;
     font-size: 0.9rem;
     border: 1px solid var(--color-main-border);
-    transition: background-color 0.2s, border-color 0.2s;
+    transition: background-color 0.2s;
     background-color: var(--color-code-bg);
-
-    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 0%, rgba(0, 0, 0, 0.035) 28px, transparent 28px);
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
 }
 
 @media (prefers-color-scheme: dark) {
     .post-content pre {
         background-color: var(--color-code-bg-dark);
-        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.035) 28px, transparent 28px);
     }
 }
 
@@ -810,10 +805,6 @@ main {
 .post-content pre:has(code[class*="sql"])::after,
 .post-content pre:has(code[class*="language-sql"])::after {
     content: "SQL";
-}
-
-.post-content pre:hover {
-    border-color: var(--color-primary-light);
 }
 
 /* --- 表格 UI/UX (表头冻结) --- */
@@ -1472,13 +1463,70 @@ main {
     color: var(--color-primary);
 }
 
+.feed-page {
+    max-width: var(--reading-width);
+}
+
+.feed-intro {
+    color: var(--color-main-subtext);
+    line-height: 1.75;
+}
+
+.feed-card {
+    margin: var(--space-xl) 0;
+    padding: var(--space-lg);
+    border: 1px solid var(--color-main-border);
+    border-radius: var(--radius-sm);
+    background-color: rgba(0, 0, 0, 0.015);
+}
+
+.feed-label {
+    margin: 0 0 var(--space-sm);
+    color: var(--color-main-subtext);
+    font-size: 0.85rem;
+}
+
+.feed-url {
+    font-family: var(--font-mono);
+    overflow-wrap: anywhere;
+}
+
+.feed-preview-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-md) 0 0;
+}
+
+.feed-preview-item {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-sm) 0;
+    border-bottom: 1px dashed var(--color-main-border);
+}
+
+.feed-preview-date {
+    flex-shrink: 0;
+    color: var(--color-main-subtext);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+}
+
 @media (prefers-color-scheme: dark) {
     .archive-link:hover {
         color: var(--color-link-dark);
     }
+
+    .feed-card {
+        background-color: rgba(255, 255, 255, 0.02);
+    }
 }
 
 @media (max-width: 600px) {
+    .feed-preview-item {
+        flex-direction: column;
+        gap: var(--space-xs);
+    }
+
     .archive-item {
         flex-direction: column;
         align-items: flex-start;
@@ -2745,7 +2793,7 @@ button:focus,
 .highlight pre,
 .highlight code {
     font-family: var(--font-mono) !important;
-    font-size: 0.85rem;
+    font-size: inherit;
 }
 
 /* 暗色模式下同样设置 */

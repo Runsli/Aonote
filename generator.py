@@ -9,6 +9,7 @@ from typing import List, Dict, Any, Tuple, Optional
 from jinja2 import Environment, FileSystemLoader
 import json 
 import re 
+import html
 import config
 from parser import tag_to_slug 
 from bs4 import BeautifulSoup 
@@ -327,6 +328,72 @@ def generate_tags_list_html(tag_map: Dict[str, List[Dict[str, Any]]], build_time
         print(f"Error tags.html: {e}")
 
 
+def generate_feed_html(sorted_posts: List[Dict[str, Any]], build_time_info: str):
+    """生成 RSS 订阅说明页 (feed/index.html)"""
+    try:
+        output_dir = os.path.join(config.BUILD_DIR, 'feed')
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, 'index.html')
+
+        base_url = config.BASE_URL.rstrip('/')
+        rss_path = make_internal_url(config.RSS_FILE)
+        rss_url = f"{base_url}{rss_path}"
+        recent_posts = [p for p in sorted_posts if not is_post_hidden(p)][:5]
+
+        feed_html = f"""
+        <div class="feed-page">
+            <h1>订阅 Feed</h1>
+            <p class="feed-intro">使用 RSS 阅读器订阅本站，第一时间接收新文章。本站保持静态输出，不需要账号，也不需要 JavaScript。</p>
+
+            <div class="feed-card">
+                <p class="feed-label">RSS 地址</p>
+                <p><a href="{rss_path}" class="feed-url">{rss_url}</a></p>
+            </div>
+        """
+
+        if recent_posts:
+            feed_html += "<h2>最近文章</h2>\n<ul class=\"feed-preview-list\">\n"
+            for post in recent_posts:
+                link = make_internal_url(post['link'])
+                title = html.escape(post['title'])
+                date_str = post['date'].strftime('%Y-%m-%d')
+                feed_html += f"""
+                <li class="feed-preview-item">
+                    <span class="feed-preview-date">{date_str}</span>
+                    <a href="{link}">{title}</a>
+                </li>
+                """
+            feed_html += "</ul>\n"
+        else:
+            feed_html += "<p class=\"empty-state\">还没有可订阅的文章。</p>\n"
+
+        feed_html += "</div>"
+
+        template = env.get_template('base.html')
+        context = {
+            'page_id': 'feed',
+            'page_title': "订阅 Feed",
+            'blog_title': config.BLOG_TITLE,
+            'blog_description': 'RSS 订阅说明',
+            'blog_author': config.BLOG_AUTHOR,
+            'content_html': feed_html,
+            'site_root': get_site_root_prefix(),
+            'current_year': datetime.now().year,
+            'css_filename': config.CSS_FILENAME,
+            'canonical_url': f"{base_url}{make_internal_url('/feed')}",
+            'footer_time_info': build_time_info,
+            'footer_content_type': config.FOOTER_CONTENT_TYPE,
+            'footer_custom_text': config.FOOTER_CUSTOM_TEXT,
+        }
+
+        html_content = template.render(context)
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(html_content)
+        print("Generated: feed/index.html")
+    except Exception as e:
+        print(f"Error feed.html: {e}")
+
+
 def generate_tag_page(tag_name: str, sorted_tag_posts: List[Dict[str, Any]], build_time_info: str):
     """生成单个标签页面"""
     try:
@@ -378,7 +445,7 @@ def generate_sitemap(parsed_posts: List[Dict[str, Any]]) -> str:
     urls = []
     base_url = config.BASE_URL.rstrip('/')
     
-    for path, prio in [('/', '1.0'), ('/archive', '0.8'), ('/tags', '0.8'), ('/404', '0.1'), (config.RSS_FILE, '0.1')]:
+    for path, prio in [('/', '1.0'), ('/archive', '0.8'), ('/tags', '0.8'), ('/feed', '0.6'), ('/404', '0.1'), (config.RSS_FILE, '0.1')]:
         urls.append(f"<url><loc>{base_url}{make_internal_url(path)}</loc><priority>{prio}</priority></url>")
 
     if os.path.exists(os.path.join(config.BUILD_DIR, 'about', 'index.html')):
