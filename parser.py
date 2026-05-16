@@ -74,8 +74,8 @@ def _resolve_local_image_path(src: str, md_file_path: str) -> Optional[str]:
 
 def _convert_colon_admonitions(markdown_text: str) -> str:
     """兼容 VuePress/VitePress 风格 ::: tip 提示块。"""
-    fence_re = re.compile(r'^(\s*):::\s*([A-Za-z0-9_-]+)?(?:\s+(.*?))?\s*$')
-    close_re = re.compile(r'^\s*:::\s*$')
+    fence_re = re.compile(r'^(\s*):{3,}\s*([A-Za-z0-9_-]+)?(?:\s+(.*?))?\s*$')
+    close_re = re.compile(r'^\s*:{3,}\s*$')
     lines = markdown_text.splitlines()
     converted = []
     i = 0
