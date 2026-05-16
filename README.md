@@ -145,6 +145,10 @@ python autobuild.py
 ```python
 print("Hello PureMo-Blog")
 ```
+
+```python title="hello.py"
+print("Hello PureMo-Blog")
+```
 ````
 
 ## 修改站点

@@ -765,6 +765,21 @@ main {
 /* --- [优化] 代码块 字体与抗锯齿优化 --- */
 .post-content .highlight {
     position: relative;
+    margin: var(--space-lg) 0;
+    overflow: hidden;
+    border: 1px solid var(--color-main-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-code-bg);
+    transition: background-color 0.2s;
+}
+
+.post-content .highlight[data-title] {
+    background-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.025) 0,
+        rgba(0, 0, 0, 0.025) 32px,
+        transparent 32px
+    );
 }
 
 .post-content pre {
@@ -774,18 +789,22 @@ main {
     text-rendering: optimizeLegibility;
 
     position: relative;
-    padding: 28px 15px 15px 15px;
-    border-radius: var(--radius-md);
-    margin: var(--space-lg) 0;
+    padding: 15px;
+    border-radius: 0;
+    margin: 0;
     overflow-x: auto;
     font-size: 0.9rem;
-    border: 1px solid var(--color-main-border);
-    transition: background-color 0.2s;
-    background-color: var(--color-code-bg);
+    border: none;
+    background-color: transparent;
+}
+
+.post-content .highlight[data-title] pre,
+.post-content .highlight[data-lang] pre {
+    padding-top: 42px;
 }
 
 @media (prefers-color-scheme: dark) {
-    .post-content pre {
+    .post-content .highlight {
         background-color: var(--color-code-bg-dark);
     }
 }
@@ -798,19 +817,65 @@ main {
     content: none;
 }
 
+.post-content .highlight[data-title] pre {
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.post-content .highlight::before {
+    content: none;
+    position: absolute;
+    top: 0;
+    left: 15px;
+    z-index: 1;
+    max-width: calc(100% - 132px);
+    height: 32px;
+    overflow: hidden;
+    color: var(--color-main-subtext);
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 32px;
+    opacity: 0.82;
+    pointer-events: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.post-content .highlight[data-title]::before {
+    content: attr(data-title);
+}
+
 /* 右上角显示语言，固定在外层容器，不随横向滚动移动 */
 .post-content .highlight::after {
     content: none;
     position: absolute;
-    top: 7px;
+    top: 6px;
     right: 15px;
-    font-size: 0.75rem;
+    z-index: 1;
+    font-size: 0.72rem;
     font-weight: 700;
     font-family: var(--font-sans);
     color: var(--color-main-subtext);
-    opacity: 0.7;
+    line-height: 1.7;
+    opacity: 0.72;
+    pointer-events: none;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+@media (prefers-color-scheme: dark) {
+    .post-content .highlight[data-title] {
+        background-image: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.035) 0,
+            rgba(255, 255, 255, 0.035) 32px,
+            transparent 32px
+        );
+    }
+
+    .post-content .highlight[data-title] pre {
+        border-top-color: rgba(255, 255, 255, 0.08);
+    }
 }
 
 .post-content .highlight[data-lang]::after {

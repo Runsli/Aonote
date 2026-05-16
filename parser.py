@@ -170,6 +170,47 @@ def _convert_emoticon_shorthands(markdown_text: str) -> str:
     return ''.join(converted)
 
 
+def _normalize_fenced_code_attributes(markdown_text: str) -> str:
+    """支持 ```python title="file.py" 这类更直观的代码块属性写法。"""
+    opening_re = re.compile(r'^(?P<indent>\s*)(?P<fence>`{3,}|~{3,})(?P<info>[^\n]*)$')
+    lines = markdown_text.splitlines(keepends=True)
+    converted = []
+    in_fence = False
+    fence_marker = ''
+    fence_length = 0
+
+    for line in lines:
+        line_body = line.rstrip('\r\n')
+        line_break = line[len(line_body):]
+        fence_match = opening_re.match(line_body)
+
+        if fence_match:
+            fence = fence_match.group('fence')
+            info = fence_match.group('info').strip()
+            marker = fence[0]
+
+            if not in_fence:
+                in_fence = True
+                fence_marker = marker
+                fence_length = len(fence)
+
+                if 'title=' in info and not info.startswith('{'):
+                    parts = info.split(maxsplit=1)
+                    language = parts[0] if parts else ''
+                    attributes = parts[1] if len(parts) > 1 else ''
+                    if language and attributes:
+                        normalized_language = language.removeprefix('.')
+                        line = f'{fence_match.group("indent")}{fence} {{.{normalized_language} {attributes}}}{line_break}'
+            elif marker == fence_marker and len(fence) >= fence_length and not info:
+                in_fence = False
+                fence_marker = ''
+                fence_length = 0
+
+        converted.append(line)
+
+    return ''.join(converted)
+
+
 def _normalize_code_text(code: str) -> str:
     """统一代码文本格式，便于 Markdown 原文和渲染后 HTML 做匹配。"""
     return code.replace('\r\n', '\n').replace('\r', '\n').strip('\n')
@@ -224,6 +265,16 @@ def _language_from_fence_info(info: str) -> Optional[str]:
     return label or None
 
 
+def _title_from_fence_info(info: str) -> Optional[str]:
+    """从围栏代码块的 info string 中提取可选标题。"""
+    match = re.search(r'''(?:^|\s)title=(?:"([^"]*)"|'([^']*)'|([^\s]+))''', info)
+    if not match:
+        return None
+
+    title = next((group for group in match.groups() if group is not None), '').strip()
+    return title or None
+
+
 def _extract_fenced_code_blocks(markdown_text: str) -> List[Dict[str, Optional[str]]]:
     """提取围栏代码块，用声明语言补充渲染后的 HTML。"""
     pattern = re.compile(
@@ -233,8 +284,10 @@ def _extract_fenced_code_blocks(markdown_text: str) -> List[Dict[str, Optional[s
     blocks = []
 
     for match in pattern.finditer(markdown_text):
+        info = match.group('info')
         blocks.append({
-            'language': _language_from_fence_info(match.group('info')),
+            'language': _language_from_fence_info(info),
+            'title': _title_from_fence_info(info),
             'code': _normalize_code_text(match.group('code')),
             'used': False,
         })
@@ -302,8 +355,8 @@ def _guess_language_label(code: str) -> Optional[str]:
     return label if label in common_labels else None
 
 
-def _detect_code_language(pre, fenced_code_blocks: List[Dict[str, Optional[str]]]) -> Optional[str]:
-    """优先使用围栏声明的语言，无法匹配时再尝试自动猜测。"""
+def _detect_code_block_metadata(pre, fenced_code_blocks: List[Dict[str, Optional[str]]]) -> Tuple[Optional[str], Optional[str]]:
+    """优先使用围栏声明的代码块信息，无法匹配时再尝试自动猜测语言。"""
     code = pre.find('code')
     code_text = _normalize_code_text(code.get_text() if code else pre.get_text())
 
@@ -311,10 +364,10 @@ def _detect_code_language(pre, fenced_code_blocks: List[Dict[str, Optional[str]]
         if not block['used'] and block['code'] == code_text:
             block['used'] = True
             if block['language']:
-                return block['language']
+                return block['language'], block.get('title')
             break
 
-    return _guess_language_label(code_text)
+    return _guess_language_label(code_text), None
 
 # 辅助函数 - 将日期时间对象标准化为日期对象
 def standardize_date(dt_obj: Any) -> date:
@@ -437,6 +490,7 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
 
     content_markdown = _convert_colon_admonitions(content_markdown)
     content_markdown = _convert_emoticon_shorthands(content_markdown)
+    content_markdown = _normalize_fenced_code_attributes(content_markdown)
     
     # --- Markdown 渲染 ---
     
@@ -515,12 +569,20 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
 
         # 3. 代码块语言标签
         for pre in soup.find_all('pre'):
-            language_label = _detect_code_language(pre, fenced_code_blocks)
+            language_label, code_title = _detect_code_block_metadata(pre, fenced_code_blocks)
+            if not language_label and not code_title:
+                continue
+
+            parent = pre.parent
+            if code_title:
+                pre['data-title'] = code_title
+                if parent and 'highlight' in parent.get('class', []):
+                    parent['data-title'] = code_title
+
             if not language_label:
                 continue
 
             pre['data-lang'] = language_label
-            parent = pre.parent
             if parent and 'highlight' in parent.get('class', []):
                 parent['data-lang'] = language_label
             code = pre.find('code')
