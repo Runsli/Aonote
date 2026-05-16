@@ -647,17 +647,7 @@ main {
     display: block;
     margin: var(--space-lg) auto;
     border: 1px solid var(--color-main-border);
-    transition: box-shadow 0.3s ease, opacity 0.3s ease;
-}
-
-.post-content img:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-}
-
-@media (prefers-color-scheme: dark) {
-    .post-content img:hover {
-        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.08);
-    }
+    transition: opacity 0.3s ease;
 }
 
 /* --- 图片说明 (Caption) 优化 --- */
@@ -687,34 +677,23 @@ main {
 /* --- 引用块 (Blockquote) 视觉增强 --- */
 .post-content blockquote {
     position: relative;
-    border-left: 3px solid var(--color-primary);
-    padding: var(--space-md) var(--space-lg) var(--space-md) calc(var(--space-lg) + var(--space-md));
+    border-left: 3px solid var(--color-main-border);
+    padding: var(--space-md) var(--space-lg);
     margin-top: var(--space-lg);
     margin-bottom: var(--space-lg);
     color: var(--color-main-subtext);
     font-style: italic;
-    background: linear-gradient(to right, rgba(0, 121, 107, 0.05), transparent);
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.03);
+    background-color: rgba(0, 0, 0, 0.015);
     border-radius: var(--radius-sm);
 }
 
 .post-content blockquote::before {
-    content: "“";
-    position: absolute;
-    top: -5px;
-    left: 10px;
-    font-size: 3rem;
-    color: var(--color-primary);
-    opacity: 0.2;
-    font-family: serif;
-    line-height: 1;
-    pointer-events: none;
+    content: none;
 }
 
 @media (prefers-color-scheme: dark) {
     .post-content blockquote {
-        background: linear-gradient(to right, rgba(255, 255, 255, 0.02), transparent);
-        box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.03);
+        background-color: rgba(255, 255, 255, 0.02);
     }
 }
 
@@ -768,7 +747,7 @@ main {
 
 /* 右上角显示语言 (默认 CODE) */
 .post-content pre::after {
-    content: "CODE";
+    content: none;
     position: absolute;
     top: 7px;
     right: 15px;
@@ -830,35 +809,28 @@ main {
     margin: var(--space-lg) 0;
     border: 1px solid var(--color-main-border);
     border-radius: var(--radius-sm);
-    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+    transition: background-color 0.2s;
     outline: none;
     background-color: var(--color-main-card);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .table-wrapper:hover {
-    border-color: var(--color-primary);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    background-color: rgba(0, 0, 0, 0.01);
 }
 
 .table-wrapper:focus-within {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px var(--color-primary-light), 0 0 0 4px var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-light);
 }
 
 @media (prefers-color-scheme: dark) {
-    .table-wrapper {
-        box-shadow: 0 1px 3px rgba(255, 255, 255, 0.05);
-    }
-
     .table-wrapper:hover {
-        border-color: var(--color-link-dark);
-        box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.02);
     }
 
     .table-wrapper:focus-within {
         border-color: var(--color-link-dark);
-        box-shadow: 0 0 0 2px rgba(0, 121, 107, 0.3), 0 0 0 4px var(--color-link-dark);
+        box-shadow: 0 0 0 2px rgba(0, 121, 107, 0.3);
     }
 }
 
@@ -892,18 +864,17 @@ main {
 }
 
 .post-content th {
-    background-color: var(--color-primary-light);
-    color: var(--color-primary);
-    font-weight: 700;
-    text-transform: uppercase;
+    background-color: rgba(0, 0, 0, 0.025);
+    color: var(--color-main-text);
+    font-weight: 600;
+    text-transform: none;
     font-size: 0.9rem;
-    border-bottom: 2px solid var(--color-primary);
+    border-bottom: 1px solid var(--color-main-border);
 
     /* 表头吸顶 (Sticky Header) */
     position: sticky;
     top: 0;
     z-index: 10;
-    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
 }
 
 .post-content tr:nth-child(even) {
@@ -915,16 +886,14 @@ main {
 }
 
 .post-content tr:hover:not(:first-child) {
-    background-color: rgba(0, 121, 107, 0.08);
+    background-color: rgba(0, 0, 0, 0.025);
 }
 
 @media (prefers-color-scheme: dark) {
     .post-content th {
-        background-color: #1e1e1e;
-        /* 不透明背景 */
-        color: var(--color-link-dark);
-        border-bottom: 2px solid var(--color-link-dark);
-        box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3);
+        background-color: rgba(255, 255, 255, 0.04);
+        color: var(--color-main-text);
+        border-bottom: 1px solid var(--color-main-border);
     }
 
     .post-content tr:nth-child(even) {
@@ -932,7 +901,7 @@ main {
     }
 
     .post-content tr:hover:not(:first-child) {
-        background-color: rgba(0, 121, 107, 0.25);
+        background-color: rgba(255, 255, 255, 0.04);
     }
 }
 
