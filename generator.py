@@ -23,6 +23,39 @@ env = Environment(
     lstrip_blocks=True
 )
 
+RAW_HTML_BLOCK_RE = re.compile(
+    r'(<(?:pre|textarea|script|style)\b[^>]*>.*?</(?:pre|textarea|script|style)>)',
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def minify_html_content(html_content: str) -> str:
+    """压缩生成的 HTML，同时保留代码块等原始空白敏感区域。"""
+    if not getattr(config, 'HTML_MINIFY', True):
+        return html_content
+
+    raw_blocks = []
+
+    def preserve_raw_block(match: re.Match) -> str:
+        raw_blocks.append(match.group(0))
+        return f"___HTML_MINIFY_RAW_BLOCK_{len(raw_blocks) - 1}___"
+
+    minified = RAW_HTML_BLOCK_RE.sub(preserve_raw_block, html_content)
+    minified = re.sub(r'<!--(?!\[if).*?-->', '', minified, flags=re.DOTALL)
+    minified = re.sub(r'>\s+<', '><', minified)
+    minified = re.sub(r'^[ \t]+', '', minified, flags=re.MULTILINE).strip()
+
+    for index, raw_block in enumerate(raw_blocks):
+        minified = minified.replace(f"___HTML_MINIFY_RAW_BLOCK_{index}___", raw_block)
+
+    return minified
+
+
+def write_html_file(output_path: str, html_content: str) -> None:
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(minify_html_content(html_content))
+
+
 # --- 辅助函数：路径和 URL (核心路径修正) ---
 
 def get_site_root_prefix() -> str:
@@ -211,8 +244,7 @@ def generate_index_html(sorted_posts: List[Dict[str, Any]], build_time_info: str
         }
         
         html_content = template.render(context)
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        write_html_file(output_path, html_content)
         print("Generated: index.html")
     except Exception as e:
         print(f"Error index.html: {e}")
@@ -276,8 +308,7 @@ def generate_archive_html(sorted_posts: List[Dict[str, Any]], build_time_info: s
         }
         
         html_content = template.render(context)
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        write_html_file(output_path, html_content)
         print("Generated: archive/index.html")
     except Exception as e:
         print(f"Error archive.html: {e}")
@@ -321,8 +352,7 @@ def generate_tags_list_html(tag_map: Dict[str, List[Dict[str, Any]]], build_time
         }
         
         html_content = template.render(context)
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        write_html_file(output_path, html_content)
         print("Generated: tags/index.html")
     except Exception as e:
         print(f"Error tags.html: {e}")
@@ -387,8 +417,7 @@ def generate_feed_html(sorted_posts: List[Dict[str, Any]], build_time_info: str)
         }
 
         html_content = template.render(context)
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        write_html_file(output_path, html_content)
         print("Generated: feed/index.html")
     except Exception as e:
         print(f"Error feed.html: {e}")
@@ -423,8 +452,7 @@ def generate_tag_page(tag_name: str, sorted_tag_posts: List[Dict[str, Any]], bui
         }
         
         html_content = template.render(context)
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        write_html_file(output_path, html_content)
         print(f"Generated tag page: {tag_name}")
     except Exception as e:
         print(f"Error tag page {tag_name}: {e}")
@@ -518,8 +546,7 @@ def generate_page_html(content_html: str, page_title: str, page_id: str, canonic
         }
         
         html_content = template.render(context)
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        write_html_file(output_path, html_content)
         print(f"Generated: {output_path} (Page ID: {page_id})")
 
     except Exception as e:
@@ -638,8 +665,7 @@ def generate_post_page(post: Dict[str, Any]):
         }
 
         html_content = template.render(context)
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        write_html_file(output_path, html_content)
         print(f"Generated: {output_path}")
 
     except Exception as e:

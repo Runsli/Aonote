@@ -37,6 +37,10 @@ BLOG_AUTHOR = "PureMo-Blog"
 # 存储 CSS 文件的哈希名
 CSS_FILENAME = 'style.css' 
 
+# 是否在生成 HTML 页面时移除模板缩进和多余标签间空白。
+# 会保留 pre/textarea/script/style 中的原始内容，避免影响代码块显示。
+HTML_MINIFY = True
+
 # 定义代码高亮使用的 CSS 类名
 CODE_HIGHLIGHT_CLASS = 'highlight'
 
