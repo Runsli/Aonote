@@ -72,6 +72,47 @@ def _resolve_local_image_path(src: str, md_file_path: str) -> Optional[str]:
     return candidate if os.path.isfile(candidate) else None
 
 
+def _convert_colon_admonitions(markdown_text: str) -> str:
+    """兼容 VuePress/VitePress 风格 ::: tip 提示块。"""
+    fence_re = re.compile(r'^(\s*):::\s*([A-Za-z0-9_-]+)?(?:\s+(.*?))?\s*$')
+    close_re = re.compile(r'^\s*:::\s*$')
+    lines = markdown_text.splitlines()
+    converted = []
+    i = 0
+
+    while i < len(lines):
+        start_match = fence_re.match(lines[i])
+        if not start_match or close_re.match(lines[i]):
+            converted.append(lines[i])
+            i += 1
+            continue
+
+        indent, kind, title = start_match.groups()
+        kind = (kind or 'note').lower()
+        body = []
+        i += 1
+
+        while i < len(lines) and not close_re.match(lines[i]):
+            body.append(lines[i])
+            i += 1
+
+        if i >= len(lines):
+            converted.append(start_match.group(0))
+            converted.extend(body)
+            continue
+
+        admonition_title = f' "{title.strip()}"' if title and title.strip() else ''
+        converted.append(f'{indent}!!! {kind}{admonition_title}')
+        if body:
+            for body_line in body:
+                converted.append(f'{indent}    {body_line}' if body_line.strip() else '')
+        else:
+            converted.append('')
+        i += 1
+
+    return '\n'.join(converted) + ('\n' if markdown_text.endswith('\n') else '')
+
+
 def _normalize_code_text(code: str) -> str:
     """统一代码文本格式，便于 Markdown 原文和渲染后 HTML 做匹配。"""
     return code.replace('\r\n', '\n').replace('\r', '\n').strip('\n')
@@ -336,6 +377,8 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
     
     # 5. summary/excerpt (保留摘要功能)
     metadata['excerpt'] = metadata.get('summary') or metadata.get('excerpt') or metadata.get('description') or ''
+
+    content_markdown = _convert_colon_admonitions(content_markdown)
     
     # --- Markdown 渲染 ---
     
