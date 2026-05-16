@@ -1,6 +1,7 @@
 # config.py
 
 import os
+from pymdownx import emoji
 
 # --- 站点配置 ---
 # 这里主要是配置站点信息，如标题、描述、作者、CSS 文件名、Markdown 扩展列表、Markdown 扩展配置、列表配置、目录和文件配置、特殊文件名称等。
@@ -159,6 +160,7 @@ MARKDOWN_EXTENSIONS = [
     'sane_lists',         # 更好的列表
     'pymdownx.tasklist',  # 任务列表支持 (- [ ])
     'pymdownx.tilde',     # [新增] 删除线支持 (~~text~~)
+    'pymdownx.emoji',     # Emoji 短代码支持 (:wink:)
 ]
 
 # 2. 扩展具体配置
@@ -177,7 +179,11 @@ MARKDOWN_EXTENSION_CONFIGS = {
     'pymdownx.tasklist': {
         'custom_checkbox': True,      # 允许使用 CSS 自定义样式
         'clickable_checkbox': False,  # 静态页面通常设为不可点击
-    }
+    },
+    'pymdownx.emoji': {
+        'emoji_index': emoji.gemoji,
+        'emoji_generator': emoji.to_alt,
+    },
 }
 # --- Markdown 配置结束 ---
 

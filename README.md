@@ -130,6 +130,7 @@ python autobuild.py
 - `sane_lists`：更稳定的列表解析。
 - `pymdownx.tasklist`：任务列表。
 - `pymdownx.tilde`：删除线。
+- `pymdownx.emoji`：Emoji 短代码；常见简写表情如 `:)`、`8-)` 会自动转为 emoji。
 
 示例：
 

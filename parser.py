@@ -113,6 +113,63 @@ def _convert_colon_admonitions(markdown_text: str) -> str:
     return '\n'.join(converted) + ('\n' if markdown_text.endswith('\n') else '')
 
 
+EMOTICON_EMOJI_MAP = {
+    '8-)': '😎',
+    ':-)': '🙂',
+    ':)': '🙂',
+    ':-(': '☹️',
+    ':(': '☹️',
+    ':-*': '😘',
+    ':*': '😘',
+    r':\*': '😘',
+    ';)': '😉',
+}
+
+EMOTICON_RE = re.compile(
+    r'(?<![\w/])(?P<emoticon>8-\)|:-\)|:\)|:-\(|:\(|:-\*|:\*|:\\\*|;\))(?![\w])'
+)
+
+
+def _convert_emoticon_shorthands(markdown_text: str) -> str:
+    """将常见 ASCII 表情简写转换为 emoji，同时避开代码围栏和行内代码。"""
+    fence_re = re.compile(r'^\s*(`{3,}|~{3,})')
+    inline_code_re = re.compile(r'(`+)(.*?)(?<!`)\1')
+    lines = markdown_text.splitlines(keepends=True)
+    converted = []
+    in_fence = False
+    fence_marker = ''
+
+    def replace_plain_text(text: str) -> str:
+        return EMOTICON_RE.sub(lambda match: EMOTICON_EMOJI_MAP[match.group('emoticon')], text)
+
+    def replace_outside_inline_code(line: str) -> str:
+        parts = []
+        last_end = 0
+        for match in inline_code_re.finditer(line):
+            parts.append(replace_plain_text(line[last_end:match.start()]))
+            parts.append(match.group(0))
+            last_end = match.end()
+        parts.append(replace_plain_text(line[last_end:]))
+        return ''.join(parts)
+
+    for line in lines:
+        fence_match = fence_re.match(line)
+        if fence_match:
+            marker = fence_match.group(1)[0]
+            if not in_fence:
+                in_fence = True
+                fence_marker = marker
+            elif marker == fence_marker:
+                in_fence = False
+                fence_marker = ''
+            converted.append(line)
+            continue
+
+        converted.append(line if in_fence else replace_outside_inline_code(line))
+
+    return ''.join(converted)
+
+
 def _normalize_code_text(code: str) -> str:
     """统一代码文本格式，便于 Markdown 原文和渲染后 HTML 做匹配。"""
     return code.replace('\r\n', '\n').replace('\r', '\n').strip('\n')
@@ -379,6 +436,7 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
     metadata['excerpt'] = metadata.get('summary') or metadata.get('excerpt') or metadata.get('description') or ''
 
     content_markdown = _convert_colon_admonitions(content_markdown)
+    content_markdown = _convert_emoticon_shorthands(content_markdown)
     
     # --- Markdown 渲染 ---
     
