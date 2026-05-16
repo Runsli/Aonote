@@ -238,7 +238,7 @@ def generate_archive_html(sorted_posts: List[Dict[str, Any]], build_time_info: s
         archive_html = "<div class=\"archive-page\">\n"
 
         if not sorted_archive:
-            archive_html += "<p class=\"empty-state\">还没有可归档的文章。</p>\n"
+            archive_html += "<p class=\"empty-state\">暂无归档。</p>\n"
         else:
             for year, posts in sorted_archive:
                 archive_html += f"<h2 class=\"archive-year\">{year} <small>({len(posts)})</small></h2>\n"
@@ -294,7 +294,7 @@ def generate_tags_list_html(tag_map: Dict[str, List[Dict[str, Any]]], build_time
         tags_html = "<h1>标签列表</h1>\n<div class=\"tag-cloud\">\n"
 
         if not sorted_tags:
-            tags_html += "<p class=\"empty-state\">还没有任何标签。</p>\n"
+            tags_html += "<p class=\"empty-state\">暂无标签。</p>\n"
         else:
             for tag, posts in sorted_tags:
                 tag_slug = tag_to_slug(tag)
@@ -365,7 +365,7 @@ def generate_feed_html(sorted_posts: List[Dict[str, Any]], build_time_info: str)
                 """
             feed_html += "</ul>\n"
         else:
-            feed_html += "<p class=\"empty-state\">还没有可订阅的文章。</p>\n"
+            feed_html += "<p class=\"empty-state\">暂无文章。</p>\n"
 
         feed_html += "</div>"
 

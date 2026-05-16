@@ -520,7 +520,9 @@ main {
 /* [优化] 限制最佳阅读宽度 (约68字符)，减少眼球扫视疲劳 */
 .post-content p,
 .post-content ul,
-.post-content ol {
+.post-content ol,
+.post-content blockquote,
+.post-content .admonition {
     max-width: var(--reading-width);
     margin-left: auto;
     margin-right: auto;
@@ -543,6 +545,24 @@ main {
 .post-content h3+p,
 .post-content h4+p {
     margin-top: 0.8em;
+}
+
+.page-post .post-content h2 {
+    color: var(--color-primary);
+}
+
+.page-post .post-content h3,
+.page-post .post-content h4,
+.page-post .post-content h5,
+.page-post .post-content h6 {
+    color: var(--color-main-text);
+    font-weight: 650;
+}
+
+@media (prefers-color-scheme: dark) {
+    .page-post .post-content h2 {
+        color: var(--color-link-dark);
+    }
 }
 
 /* [优化] 标题锚点提示 (Hover 显示 #) */
@@ -591,7 +611,7 @@ main {
 
 .page-post .post-content ul,
 .page-post .post-content ol {
-    color: var(--color-primary);
+    color: var(--color-main-text);
 }
 
 .page-post .post-content ul li,
@@ -625,7 +645,7 @@ main {
     height: auto;
     border-radius: var(--radius-sm);
     display: block;
-    margin: 30px auto;
+    margin: var(--space-lg) auto;
     border: 1px solid var(--color-main-border);
     transition: box-shadow 0.3s ease, opacity 0.3s ease;
 }
@@ -655,7 +675,7 @@ main {
     border-bottom: 1px solid var(--color-main-border);
     padding: 8px 0;
     margin-top: -20px;
-    margin-bottom: 30px;
+    margin-bottom: var(--space-lg);
 }
 
 .post-content img+em::before {
@@ -668,8 +688,9 @@ main {
 .post-content blockquote {
     position: relative;
     border-left: 3px solid var(--color-primary);
-    padding: 15px 20px 15px 40px;
-    margin: 25px 0;
+    padding: var(--space-md) var(--space-lg) var(--space-md) calc(var(--space-lg) + var(--space-md));
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-lg);
     color: var(--color-main-subtext);
     font-style: italic;
     background: linear-gradient(to right, rgba(0, 121, 107, 0.05), transparent);
@@ -727,7 +748,7 @@ main {
     position: relative;
     padding: 28px 15px 15px 15px;
     border-radius: var(--radius-md);
-    margin: 25px 0;
+    margin: var(--space-lg) 0;
     overflow-x: auto;
     font-size: 0.9rem;
     border: 1px solid var(--color-main-border);
@@ -768,33 +789,28 @@ main {
 .post-content pre:has(code[class*="python"])::after,
 .post-content pre:has(code[class*="language-python"])::after {
     content: "PYTHON";
-    color: #3572A5;
 }
 
 .post-content pre:has(code[class*="js"])::after,
 .post-content pre:has(code[class*="javascript"])::after,
 .post-content pre:has(code[class*="language-javascript"])::after {
     content: "JS";
-    color: #f1e05a;
 }
 
 .post-content pre:has(code[class*="css"])::after,
 .post-content pre:has(code[class*="language-css"])::after {
     content: "CSS";
-    color: #563d7c;
 }
 
 .post-content pre:has(code[class*="html"])::after,
 .post-content pre:has(code[class*="language-html"])::after {
     content: "HTML";
-    color: #e34c26;
 }
 
 .post-content pre:has(code[class*="bash"])::after,
 .post-content pre:has(code[class*="shell"])::after,
 .post-content pre:has(code[class*="language-bash"])::after {
     content: "SHELL";
-    color: #89e051;
 }
 
 .post-content pre:has(code[class*="json"])::after,
@@ -811,7 +827,7 @@ main {
 .table-wrapper {
     width: 100%;
     overflow-x: auto;
-    margin: 30px 0;
+    margin: var(--space-lg) 0;
     border: 1px solid var(--color-main-border);
     border-radius: var(--radius-sm);
     transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
@@ -921,8 +937,9 @@ main {
 }
 
 .admonition {
-    margin: 25px 0;
-    padding: 15px;
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md);
     border: 1px solid var(--color-main-border);
     border-left-width: 4px;
     border-radius: var(--radius-sm);
@@ -992,10 +1009,10 @@ main {
 .post-meta {
     font-size: 0.9rem;
     color: var(--color-main-subtext);
-    margin-bottom: 25px;
+    margin-bottom: var(--space-lg);
     padding-bottom: 0;
     border-top: 2px dashed var(--color-main-border);
-    padding-top: 15px;
+    padding-top: var(--space-md);
 }
 
 .post-content h2:first-of-type {
@@ -1013,21 +1030,21 @@ main {
 .meta-date {
     font-family: var(--font-mono);
     font-size: 0.9rem;
-    padding: 3px var(--space-sm);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-code-bg);
-    border: 1px solid var(--color-main-border);
-    opacity: 1;
+    padding: 0;
+    border-radius: 0;
+    background-color: transparent;
+    border: 0;
+    opacity: 0.85;
     display: flex;
     align-items: center;
     line-height: 1.2;
-    height: 1.8em;
+    height: auto;
 }
 
 @media (prefers-color-scheme: dark) {
     .meta-date {
-        background-color: var(--color-code-bg-dark);
-        border-color: var(--color-border-light);
+        background-color: transparent;
+        border-color: transparent;
     }
 }
 
@@ -1499,9 +1516,32 @@ main {
 
 .feed-preview-item {
     display: flex;
+    align-items: baseline;
+    position: relative;
     gap: var(--space-md);
-    padding: var(--space-sm) 0;
+    padding: var(--space-sm) var(--space-md);
     border-bottom: 1px dashed var(--color-main-border);
+    transition: background-color 0.2s;
+}
+
+.feed-preview-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: -1px;
+    width: 4px;
+    background-color: transparent;
+    transition: background-color 0.2s;
+}
+
+.feed-preview-item:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.feed-preview-item:hover::before,
+.feed-preview-item:focus-within::before {
+    background-color: var(--color-primary);
 }
 
 .feed-preview-date {
@@ -1509,6 +1549,17 @@ main {
     color: var(--color-main-subtext);
     font-family: var(--font-mono);
     font-size: 0.9rem;
+    width: 6.5rem;
+    text-align: right;
+}
+
+.feed-preview-item a {
+    color: var(--color-main-text);
+    text-decoration: none;
+}
+
+.feed-preview-item a:hover {
+    color: var(--color-primary);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1519,12 +1570,31 @@ main {
     .feed-card {
         background-color: rgba(255, 255, 255, 0.02);
     }
+
+    .feed-preview-item:hover {
+        background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .feed-preview-item:hover::before,
+    .feed-preview-item:focus-within::before {
+        background-color: var(--color-link-dark);
+    }
+
+    .feed-preview-item a:hover {
+        color: var(--color-link-dark);
+    }
 }
 
 @media (max-width: 600px) {
     .feed-preview-item {
         flex-direction: column;
         gap: var(--space-xs);
+    }
+
+    .feed-preview-date {
+        width: auto;
+        text-align: left;
+        font-size: 0.85rem;
     }
 
     .archive-item {
@@ -1752,6 +1822,19 @@ button:focus,
         font-size: 1.7rem;
     }
 
+    .page-header h1 {
+        font-size: 1.65rem;
+        line-height: 1.28;
+    }
+
+    .post-content h2 {
+        font-size: 1.45rem;
+    }
+
+    .post-content h3 {
+        font-size: 1.2rem;
+    }
+
     .post-list-item .post-title {
         font-size: 1.4rem;
     }
@@ -1784,6 +1867,22 @@ button:focus,
         justify-content: flex-start;
         width: 100%;
     }
+
+    .page-header h1 {
+        font-size: 1.55rem;
+    }
+
+    .post-list-item .post-title {
+        font-size: 1.3rem;
+    }
+
+    .post-content h2 {
+        font-size: 1.35rem;
+    }
+
+    .post-content h3 {
+        font-size: 1.15rem;
+    }
 }
 
 /* =========================================
@@ -1815,37 +1914,35 @@ button:focus,
 .post-navigation {
     display: flex;
     justify-content: space-between;
-    gap: var(--space-xl);
+    gap: var(--space-lg);
     margin-top: calc(var(--space-xl) * 1.5);
-    padding-top: var(--space-xl);
+    padding-top: var(--space-lg);
     border-top: 1px solid var(--color-main-border);
 }
 
-/* [优化] 底部导航卡片效果 */
 .nav-link {
     display: block;
     flex: 1;
-    padding: var(--space-md);
-    border: 1px solid var(--color-main-border);
-    border-radius: var(--radius-sm);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
     text-decoration: none !important;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     box-shadow: none;
-    transition: border-color 0.2s, background-color 0.2s;
+    transition: color 0.2s;
 }
 
 .nav-link:hover {
     box-shadow: none;
-    background-color: var(--color-main-card);
-    border-color: var(--color-primary);
+    background-color: transparent;
 }
 
 @media (prefers-color-scheme: dark) {
     .nav-link:hover {
         box-shadow: none;
-        background-color: var(--color-code-bg-dark);
+        background-color: transparent;
     }
 }
 
@@ -1916,21 +2013,21 @@ button:focus,
    R. 版权声明
    ========================================= */
 .post-license {
-    margin: 40px 0 0;
-    padding: 15px 25px 15px 20px;
-    border: none;
-    border-left: 4px solid var(--color-primary);
+    margin: var(--space-xl) 0 0;
+    padding: var(--space-md) 0 0;
+    border: 0;
+    border-top: 1px dashed var(--color-main-border);
     border-radius: 0;
-    background-color: var(--color-primary-light);
-    font-size: 0.9rem;
+    background-color: transparent;
+    font-size: 0.85rem;
     color: var(--color-main-subtext);
     line-height: 1.6;
 }
 
 @media (prefers-color-scheme: dark) {
     .post-license {
-        background-color: rgba(0, 121, 107, 0.15);
-        border-left-color: var(--color-link-dark);
+        background-color: transparent;
+        border-top-color: var(--color-main-border);
     }
 }
 
@@ -1946,38 +2043,38 @@ button:focus,
 .license-icon i {
     display: inline-block;
     font-style: normal;
-    font-weight: 700;
+    font-weight: 600;
     margin-right: 2px;
     padding: 0 4px;
-    border: 1px solid var(--color-primary);
+    border: 1px solid var(--color-main-border);
     border-radius: 3px;
-    color: var(--color-primary);
+    color: var(--color-main-subtext);
     font-size: 0.85em;
     line-height: 1.5;
     vertical-align: middle;
-    transition: all 0.2s;
+    transition: color 0.2s, border-color 0.2s;
 }
 
 @media (prefers-color-scheme: dark) {
     .license-icon i {
-        border-color: var(--color-link-dark);
-        color: var(--color-link-dark);
+        border-color: var(--color-main-border);
+        color: var(--color-text-secondary-dark);
     }
 
     .post-license a:hover .license-icon i {
-        background-color: var(--color-link-dark);
-        color: var(--color-background-dark);
+        background-color: transparent;
+        color: var(--color-link-dark);
     }
 }
 
 .post-license a:hover .license-icon i {
-    background-color: var(--color-primary);
-    color: var(--color-background);
+    border-color: currentColor;
+    color: var(--color-primary);
 }
 
 .license-format-code {
-    margin-top: 10px;
-    padding: 8px 12px;
+    margin-top: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
     border-radius: 4px;
     overflow-x: auto;
     font-size: 0.9em;
