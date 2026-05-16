@@ -2082,6 +2082,14 @@ button:focus,
     background-color: var(--color-code-bg);
 }
 
+.license-format-code code {
+    display: block;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.65;
+}
+
 @media (prefers-color-scheme: dark) {
     .license-format-code {
         background-color: var(--color-code-bg-dark);

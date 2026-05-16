@@ -226,9 +226,7 @@
     
     {% if copyright_config.show_standard_format %}
     <div class="license-format-code">
-        <code>
-            {{ copyright_format(post.title, blog_author, canonical_url) | safe }}
-        </code>
+        <code>{{ copyright_format(post.title, blog_author, canonical_url) | safe }}</code>
     </div>
     {% endif %}
 </div>
