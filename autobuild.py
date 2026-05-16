@@ -113,6 +113,12 @@ def hash_file(filepath: str) -> str:
     except FileNotFoundError:
         return 'nohash'
 
+
+def post_sort_key(post: Dict[str, Any]):
+    """文章排序键：日期优先，同一天内按 slug 稳定排序。"""
+    stable_slug = str(post.get('slug') or post.get('link') or '').lower()
+    return post['date'], stable_slug
+
 # [修复后的 FUNCTION] 获取文件的最后修改时间 (Git -> Filesystem -> Fallback with Microseconds)
 def format_file_mod_time(filepath: str) -> str:
     """
@@ -571,7 +577,7 @@ def build_site():
             new_manifest['posts'].pop(deleted_path, None)
 
 
-    final_parsed_posts = sorted(parsed_posts, key=lambda p: p['date'], reverse=True)
+    final_parsed_posts = sorted(parsed_posts, key=post_sort_key, reverse=True)
     
     print(f"   -> Successfully parsed {len(final_parsed_posts)} blog posts. ({len(posts_to_build)} HTML files rebuilt)")
 
@@ -613,12 +619,14 @@ def build_site():
     # -------------------------------------------------------------------------
     print("\n[5/5] Generating HTML...")
     
-    # 1. 生成普通文章详情页 
-    # ⭐ 修复: 如果主题变动，重建所有文章页
-    posts_to_build_all = final_parsed_posts if theme_changed else posts_to_build
+    # 1. 生成普通文章详情页
+    # 文章数据变化时也重建全部文章页，确保上一篇/下一篇导航同步更新。
+    posts_to_build_all = final_parsed_posts if (theme_changed or posts_data_changed) else posts_to_build
     
     if theme_changed and not posts_to_build:
         print("   -> [REBUILDING] ALL Post Pages (Theme changed, but no post content changed)")
+    elif posts_data_changed:
+        print("   -> [REBUILDING] ALL Post Pages (Post order or metadata changed)")
 
     # 如果主题/逻辑变动，posts_to_build_all 是所有文章，否则只是变动的文章
     for post in posts_to_build_all:
@@ -634,7 +642,7 @@ def build_site():
         generator.generate_tags_list_html(tag_map, global_build_time_cn) 
 
         for tag, posts in tag_map.items():
-            sorted_tag = sorted(posts, key=lambda p: p['date'], reverse=True)
+            sorted_tag = sorted(posts, key=post_sort_key, reverse=True)
             generator.generate_tag_page(tag, sorted_tag, global_build_time_cn) 
 
         generator.generate_robots_txt()

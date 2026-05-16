@@ -765,6 +765,10 @@ main {
     letter-spacing: 0.05em;
 }
 
+.post-content pre[data-lang]::after {
+    content: attr(data-lang);
+}
+
 /* 使用 :has() 根据 code class 显示具体语言 */
 .post-content pre:has(code[class*="python"])::after,
 .post-content pre:has(code[class*="language-python"])::after {

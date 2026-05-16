@@ -3,9 +3,10 @@
 import os
 import re
 import yaml
+import json
 import markdown
 from datetime import datetime, date
-from typing import Dict, Any, Tuple, Optional
+from typing import Dict, Any, Tuple, Optional, List
 import config 
 import unicodedata 
 from bs4 import BeautifulSoup # 引入 BeautifulSoup
@@ -69,6 +70,153 @@ def _resolve_local_image_path(src: str, md_file_path: str) -> Optional[str]:
         candidate = os.path.join(os.path.dirname(md_file_path), src)
 
     return candidate if os.path.isfile(candidate) else None
+
+
+def _normalize_code_text(code: str) -> str:
+    """统一代码文本格式，便于 Markdown 原文和渲染后 HTML 做匹配。"""
+    return code.replace('\r\n', '\n').replace('\r', '\n').strip('\n')
+
+
+def _normalize_language_label(language: str) -> str:
+    """将语言别名转换成短标签，用于代码块右上角显示。"""
+    normalized = language.strip().lower()
+    normalized = normalized.removeprefix('language-').removeprefix('.')
+
+    aliases = {
+        'py': 'PYTHON',
+        'python': 'PYTHON',
+        'python3': 'PYTHON',
+        'js': 'JS',
+        'javascript': 'JS',
+        'ts': 'TS',
+        'typescript': 'TS',
+        'sh': 'SHELL',
+        'shell': 'SHELL',
+        'bash': 'SHELL',
+        'zsh': 'SHELL',
+        'html': 'HTML',
+        'xml': 'XML',
+        'css': 'CSS',
+        'scss': 'SCSS',
+        'json': 'JSON',
+        'yaml': 'YAML',
+        'yml': 'YAML',
+        'md': 'MD',
+        'markdown': 'MD',
+        'sql': 'SQL',
+        'txt': 'TEXT',
+        'text': 'TEXT',
+    }
+
+    return aliases.get(normalized, re.sub(r'[^a-z0-9#+-]+', '-', normalized).strip('-').upper())
+
+
+def _language_from_fence_info(info: str) -> Optional[str]:
+    """从围栏代码块的 info string 中提取语言名。"""
+    first_token = info.strip().split(maxsplit=1)[0] if info.strip() else ''
+    if not first_token:
+        return None
+
+    # 支持 Python-Markdown attr_list 风格：``` {.python}
+    attr_match = re.search(r'\.([A-Za-z0-9_+#-]+)', first_token)
+    if attr_match:
+        first_token = attr_match.group(1)
+
+    label = _normalize_language_label(first_token)
+    return label or None
+
+
+def _extract_fenced_code_blocks(markdown_text: str) -> List[Dict[str, Optional[str]]]:
+    """提取围栏代码块，用声明语言补充渲染后的 HTML。"""
+    pattern = re.compile(
+        r'^(?P<fence>`{3,}|~{3,})[ \t]*(?P<info>[^\n]*)\n(?P<code>.*?)(?:\n(?P=fence)[ \t]*)$',
+        re.MULTILINE | re.DOTALL,
+    )
+    blocks = []
+
+    for match in pattern.finditer(markdown_text):
+        blocks.append({
+            'language': _language_from_fence_info(match.group('info')),
+            'code': _normalize_code_text(match.group('code')),
+            'used': False,
+        })
+
+    return blocks
+
+
+def _guess_language_label(code: str) -> Optional[str]:
+    """未声明语言时，使用 Pygments 做最佳努力的语言猜测。"""
+    stripped_code = code.strip()
+    if not stripped_code:
+        return None
+
+    if stripped_code.startswith('<') and '>' in stripped_code:
+        return 'HTML'
+
+    try:
+        json.loads(stripped_code)
+        return 'JSON'
+    except json.JSONDecodeError:
+        pass
+
+    if re.search(r'(^|\n)\s*(def|class)\s+\w+|(^|\n)\s*(from\s+\w+\s+import|import\s+\w+)|print\s*\(', stripped_code):
+        return 'PYTHON'
+
+    if re.search(r'\b(console\.log|function\s+\w*|const\s+\w+|let\s+\w+|var\s+\w+|=>)\b', stripped_code):
+        return 'JS'
+
+    if re.search(r'\b(SELECT|FROM|WHERE|INSERT|UPDATE|DELETE|CREATE TABLE|ALTER TABLE)\b', stripped_code, re.IGNORECASE):
+        return 'SQL'
+
+    if '{' in stripped_code and '}' in stripped_code and re.search(r'[\w-]+\s*:\s*[^;{}]+;', stripped_code):
+        return 'CSS'
+
+    if re.search(r'(^|\n)\s*(#!\/|npm\s+|pnpm\s+|yarn\s+|cd\s+|mkdir\s+|python3?\s+|git\s+)', stripped_code):
+        return 'SHELL'
+
+    if re.search(r'(^|\n)\s*(#{1,6}\s+|[-*+]\s+|>\s+)|```', stripped_code):
+        return 'MD'
+
+    try:
+        from pygments.lexers import guess_lexer
+        from pygments.util import ClassNotFound
+    except ImportError:
+        return None
+
+    try:
+        lexer = guess_lexer(code)
+    except ClassNotFound:
+        return None
+
+    aliases = getattr(lexer, 'aliases', None) or []
+    if not aliases:
+        return None
+
+    alias = aliases[0]
+    if alias in ('text', 'none'):
+        return None
+
+    label = _normalize_language_label(alias)
+    common_labels = {
+        'PYTHON', 'JS', 'TS', 'SHELL', 'HTML', 'XML', 'CSS', 'SCSS',
+        'JSON', 'YAML', 'MD', 'SQL',
+    }
+    return label if label in common_labels else None
+
+
+def _detect_code_language(pre, fenced_code_blocks: List[Dict[str, Optional[str]]]) -> Optional[str]:
+    """优先使用围栏声明的语言，无法匹配时再尝试自动猜测。"""
+    code = pre.find('code')
+    code_text = _normalize_code_text(code.get_text() if code else pre.get_text())
+
+    for block in fenced_code_blocks:
+        if not block['used'] and block['code'] == code_text:
+            block['used'] = True
+            if block['language']:
+                return block['language']
+            break
+
+    return _guess_language_label(code_text)
 
 # 辅助函数 - 将日期时间对象标准化为日期对象
 def standardize_date(dt_obj: Any) -> date:
@@ -204,6 +352,8 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
         output_format='html5',
     )
     
+    fenced_code_blocks = _extract_fenced_code_blocks(content_markdown)
+
     # 2. 转换
     content_html = md.convert(content_markdown)
     
@@ -211,7 +361,7 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
     # [重构] UI 增强：图片懒加载 (Lazy Load) 和表格包裹器
     # -------------------------------------------------------------------------
     # 使用 BeautifulSoup 来进行安全、可靠的 HTML 变换
-    if '<img' in content_html or '<table' in content_html:
+    if '<img' in content_html or '<table' in content_html or '<pre' in content_html:
         soup = BeautifulSoup(content_html, 'html.parser')
 
         # 1. 图片懒加载 (Lazy Load)
@@ -261,6 +411,20 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
             
             # 将 table 放入 wrapper_div
             wrapper_div.append(table)
+
+        # 3. 代码块语言标签
+        for pre in soup.find_all('pre'):
+            language_label = _detect_code_language(pre, fenced_code_blocks)
+            if not language_label:
+                continue
+
+            pre['data-lang'] = language_label
+            code = pre.find('code')
+            if code:
+                code_classes = code.get('class', [])
+                language_class = f"language-{language_label.lower()}"
+                if language_class not in code_classes:
+                    code['class'] = code_classes + [language_class]
             
         content_html = str(soup)
     
