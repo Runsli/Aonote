@@ -161,6 +161,7 @@ MARKDOWN_EXTENSIONS = [
     'pymdownx.tasklist',  # 任务列表支持 (- [ ])
     'pymdownx.tilde',     # [新增] 删除线支持 (~~text~~)
     'pymdownx.emoji',     # Emoji 短代码支持 (:wink:)
+    'pymdownx.arithmatex', # 数学公式支持 ($...$ / $$...$$)
 ]
 
 # 2. 扩展具体配置
@@ -183,6 +184,9 @@ MARKDOWN_EXTENSION_CONFIGS = {
     'pymdownx.emoji': {
         'emoji_index': emoji.gemoji,
         'emoji_generator': emoji.to_alt,
+    },
+    'pymdownx.arithmatex': {
+        'generic': True,
     },
 }
 # --- Markdown 配置结束 ---

@@ -10,6 +10,7 @@ from typing import Dict, Any, Tuple, Optional, List
 import config 
 import unicodedata 
 from bs4 import BeautifulSoup # 引入 BeautifulSoup
+from latex2mathml.converter import convert as convert_latex_to_mathml
 
 
 def _read_image_dimensions(image_path: str) -> Optional[Tuple[int, int]]:
@@ -173,11 +174,31 @@ def _convert_emoticon_shorthands(markdown_text: str) -> str:
 def _normalize_fenced_code_attributes(markdown_text: str) -> str:
     """支持 ```python title="file.py" 这类更直观的代码块属性写法。"""
     opening_re = re.compile(r'^(?P<indent>\s*)(?P<fence>`{3,}|~{3,})(?P<info>[^\n]*)$')
+    title_re = re.compile(r'''(?:^|\s)title=(?:"[^"]*"|'[^']*'|[^\s}]+)''')
+    hl_lines_re = re.compile(r'''hl_lines=(?:"([^"]*)"|'([^']*)'|([^\s}]+))''')
     lines = markdown_text.splitlines(keepends=True)
     converted = []
     in_fence = False
     fence_marker = ''
     fence_length = 0
+
+    def expand_hl_lines(match: re.Match) -> str:
+        value = next((group for group in match.groups() if group is not None), '')
+        expanded = []
+        for token in re.split(r'[\s,]+', value.strip()):
+            if not token:
+                continue
+            range_match = re.fullmatch(r'(\d+)-(\d+)', token)
+            if range_match:
+                start, end = map(int, range_match.groups())
+                if start <= end:
+                    expanded.extend(str(line_no) for line_no in range(start, end + 1))
+                else:
+                    expanded.extend(str(line_no) for line_no in range(start, end - 1, -1))
+            elif token.isdigit():
+                expanded.append(token)
+
+        return f'hl_lines="{" ".join(dict.fromkeys(expanded))}"'
 
     for line in lines:
         line_body = line.rstrip('\r\n')
@@ -193,14 +214,22 @@ def _normalize_fenced_code_attributes(markdown_text: str) -> str:
                 in_fence = True
                 fence_marker = marker
                 fence_length = len(fence)
+                info = hl_lines_re.sub(expand_hl_lines, info)
 
-                if 'title=' in info and not info.startswith('{'):
-                    parts = info.split(maxsplit=1)
-                    language = parts[0] if parts else ''
-                    attributes = parts[1] if len(parts) > 1 else ''
-                    if language and attributes:
-                        normalized_language = language.removeprefix('.')
-                        line = f'{fence_match.group("indent")}{fence} {{.{normalized_language} {attributes}}}{line_break}'
+                if 'title=' in info:
+                    if info.startswith('{') and info.endswith('}'):
+                        normalized_info = title_re.sub('', info).replace('{ ', '{').strip()
+                        normalized_info = re.sub(r'\s+', ' ', normalized_info)
+                        line = f'{fence_match.group("indent")}{fence} {normalized_info}{line_break}'
+                    elif not info.startswith('{'):
+                        parts = info.split(maxsplit=1)
+                        language = parts[0] if parts else ''
+                        attributes = parts[1] if len(parts) > 1 else ''
+                        attributes = title_re.sub('', attributes).strip()
+                        if language:
+                            normalized_language = language.removeprefix('.')
+                            attribute_suffix = f' {attributes}' if attributes else ''
+                            line = f'{fence_match.group("indent")}{fence} {{.{normalized_language}{attribute_suffix}}}{line_break}'
             elif marker == fence_marker and len(fence) >= fence_length and not info:
                 in_fence = False
                 fence_marker = ''
@@ -214,6 +243,39 @@ def _normalize_fenced_code_attributes(markdown_text: str) -> str:
 def _normalize_code_text(code: str) -> str:
     """统一代码文本格式，便于 Markdown 原文和渲染后 HTML 做匹配。"""
     return code.replace('\r\n', '\n').replace('\r', '\n').strip('\n')
+
+
+def _render_mathml(soup: BeautifulSoup) -> None:
+    """将 arithmatex 生成的 TeX 包装节点替换为静态 MathML。"""
+    for math_node in soup.select('.arithmatex'):
+        raw_text = math_node.get_text().strip()
+        display_mode = math_node.name == 'div' or raw_text.startswith('\\[') or raw_text.startswith('$$')
+
+        if raw_text.startswith('\\(') and raw_text.endswith('\\)'):
+            latex = raw_text[2:-2].strip()
+        elif raw_text.startswith('\\[') and raw_text.endswith('\\]'):
+            latex = raw_text[2:-2].strip()
+        elif raw_text.startswith('$$') and raw_text.endswith('$$'):
+            latex = raw_text[2:-2].strip()
+        else:
+            latex = raw_text
+
+        if not latex:
+            continue
+
+        try:
+            mathml = convert_latex_to_mathml(latex)
+        except Exception:
+            continue
+
+        mathml_soup = BeautifulSoup(mathml, 'html.parser')
+        math_tag = mathml_soup.find('math')
+        if not math_tag:
+            continue
+
+        math_tag['display'] = 'block' if display_mode else 'inline'
+        math_node.clear()
+        math_node.append(math_tag)
 
 
 def _normalize_language_label(language: str) -> str:
@@ -490,7 +552,6 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
 
     content_markdown = _convert_colon_admonitions(content_markdown)
     content_markdown = _convert_emoticon_shorthands(content_markdown)
-    content_markdown = _normalize_fenced_code_attributes(content_markdown)
     
     # --- Markdown 渲染 ---
     
@@ -508,6 +569,7 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
     )
     
     fenced_code_blocks = _extract_fenced_code_blocks(content_markdown)
+    content_markdown = _normalize_fenced_code_attributes(content_markdown)
 
     # 2. 转换
     content_html = md.convert(content_markdown)
@@ -516,8 +578,10 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
     # [重构] UI 增强：图片懒加载 (Lazy Load) 和表格包裹器
     # -------------------------------------------------------------------------
     # 使用 BeautifulSoup 来进行安全、可靠的 HTML 变换
-    if '<img' in content_html or '<table' in content_html or '<pre' in content_html:
+    if '<img' in content_html or '<table' in content_html or '<pre' in content_html or 'arithmatex' in content_html:
         soup = BeautifulSoup(content_html, 'html.parser')
+
+        _render_mathml(soup)
 
         # 1. 图片懒加载 (Lazy Load)
         for img in soup.find_all('img'):

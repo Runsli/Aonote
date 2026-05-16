@@ -131,6 +131,7 @@ python autobuild.py
 - `pymdownx.tasklist`：任务列表。
 - `pymdownx.tilde`：删除线。
 - `pymdownx.emoji`：Emoji 短代码；常见简写表情如 `:)`、`8-)` 会自动转为 emoji。
+- `pymdownx.arithmatex`：数学公式，构建期渲染为静态 MathML。
 
 示例：
 
@@ -149,6 +150,17 @@ print("Hello PureMo-Blog")
 ```python title="hello.py"
 print("Hello PureMo-Blog")
 ```
+
+```python title="hello.py" hl_lines="2"
+message = "Hello PureMo-Blog"
+print(message)
+```
+
+行内公式：$E = mc^2$
+
+$$
+\int_0^1 x^2 dx = \frac{1}{3}
+$$
 ````
 
 ## 修改站点
@@ -217,6 +229,7 @@ PureMo-Blog 的页面目标是作为文档存在，而不是 Web App。当前默
 
 - 不输出可执行 JavaScript。
 - 结构化数据使用 Microdata，而不是 JSON-LD `<script>`。
+- 数学公式在构建期渲染为静态 MathML，不需要浏览器端脚本。
 - 安全响应头包含 `script-src 'none'`。
 - 目录、返回顶部、移动端目录等交互均使用 HTML/CSS 原生能力。
 
