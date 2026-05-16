@@ -82,7 +82,7 @@
                     {# 移动端目录 #}
                     {% if toc_html %}
                     <details class="mobile-toc">
-                        <summary>📑 目录</summary>
+                        <summary>目录</summary>
                         <div class="mobile-toc-content">
                             {{ toc_html | safe }}
                         </div>
@@ -114,14 +114,13 @@
 
                         <div class="post-list-meta-line">
                             <span class="meta-date-wrapper">
-                                <span class="date-icon">📅</span>
                                 {{post.date_formatted}}
                             </span>
 
                             {% if post.tags %}
                             <div class="tags-wrapper">
                                 {% for tag in post.tags %}
-                                <span class="tag-badge">🏷️ {{ tag.name }}</span>
+                                <span class="tag-badge">{{ tag.name }}</span>
                                 {% endfor %}
                             </div>
                             {% endif %}

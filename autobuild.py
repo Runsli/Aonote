@@ -302,6 +302,15 @@ def build_site():
             # 如果压缩失败，回退到普通复制
             shutil.copy2(css_source, compressed_css_path)
 
+        # 清理旧的 hash CSS，避免增量构建长期积累无用资源。
+        for css_file in glob.glob(os.path.join(assets_dir, 'style.*.css')):
+            if os.path.basename(css_file) != new_css:
+                try:
+                    os.remove(css_file)
+                    print(f"   -> Removed stale CSS asset: {os.path.basename(css_file)}")
+                except OSError as e:
+                    print(f"   -> WARNING: Failed to remove stale CSS asset {css_file}: {e}")
+
         # 检查CSS文件内容是否变动 (使用 get_full_content_hash)
         current_css_content_hash = get_full_content_hash(css_source)
         old_css_content_hash = old_manifest.get('static_files', {}).get(css_source)
