@@ -97,6 +97,8 @@
 
     --content-width: 800px;
     --reading-width: 68ch;
+    --header-offset: 90px;
+    --header-offset-mobile: 130px;
 
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     /* [优化] 代码等宽字体族：彻底解决 Windows 宋体问题 */
@@ -188,7 +190,7 @@ h6 {
     margin-bottom: 0.6em;
     font-weight: 700;
     color: var(--color-main-text);
-    scroll-margin-top: 90px;
+    scroll-margin-top: var(--header-offset);
     overflow-wrap: break-word;
     /* 确保长单词不会撑破布局 */
 }
@@ -594,18 +596,10 @@ main {
 
 .page-post .post-content ul li,
 .page-post .post-content ol li {
-    padding: 3px 5px;
-    border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
-    margin-bottom: 0.8em;
+    padding: 0;
+    border-bottom: none;
+    margin-bottom: 0.5em;
     color: var(--color-main-text);
-    transition: background-color 0.2s;
-    margin-left: -5px;
-    width: calc(100% + 5px);
-}
-
-.page-post .post-content ul li:hover,
-.page-post .post-content ol li:hover {
-    background-color: rgba(0, 0, 0, 0.015);
 }
 
 .page-post .post-content ul li:last-child,
@@ -620,19 +614,9 @@ main {
 
 @media (prefers-color-scheme: dark) {
 
-    .page-post .post-content ul li,
-    .page-post .post-content ol li {
-        border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
-    }
-
     .page-post .post-content ul li::marker,
     .page-post .post-content ol li::marker {
         color: var(--color-link-dark);
-    }
-
-    .page-post .post-content ul li:hover,
-    .page-post .post-content ol li:hover {
-        background-color: rgba(255, 255, 255, 0.03);
     }
 }
 
@@ -651,14 +635,7 @@ main {
 }
 
 @media (prefers-color-scheme: dark) {
-
-    /* 暗色模式图片降权 */
-    .post-content img {
-        opacity: 0.85;
-    }
-
     .post-content img:hover {
-        opacity: 1;
         box-shadow: 0 8px 20px rgba(255, 255, 255, 0.08);
     }
 }
@@ -748,8 +725,7 @@ main {
     text-rendering: optimizeLegibility;
 
     position: relative;
-    padding: 45px 15px 15px 15px;
-    /* 顶部加高，给标题栏留位 */
+    padding: 36px 15px 15px 15px;
     border-radius: var(--radius-md);
     margin: 25px 0;
     overflow-x: auto;
@@ -759,8 +735,7 @@ main {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     background-color: var(--color-code-bg);
 
-    /* 模拟窗口标题栏背景 */
-    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.05) 30px, transparent 30px);
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 0%, rgba(0, 0, 0, 0.035) 28px, transparent 28px);
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
@@ -769,29 +744,19 @@ main {
     .post-content pre {
         background-color: var(--color-code-bg-dark);
         box-shadow: 0 4px 6px -1px rgba(255, 255, 255, 0.05);
-        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.05) 30px, transparent 30px);
+        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.035) 28px, transparent 28px);
     }
 }
 
-/* MacOS 风格红黄绿点 (定位微调) */
 .post-content pre::before {
-    content: "";
-    position: absolute;
-    top: 10px;
-    /* 居中于标题栏 */
-    left: 16px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #ff5f56;
-    box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f;
+    content: none;
 }
 
 /* 右上角显示语言 (默认 CODE) */
 .post-content pre::after {
     content: "CODE";
     position: absolute;
-    top: 6px;
+    top: 7px;
     right: 15px;
     font-size: 0.75rem;
     font-weight: 700;
@@ -909,6 +874,18 @@ main {
     border-bottom: 1px solid var(--color-main-border);
     text-align: left;
     line-height: 1.5;
+}
+
+.post-content .align-left {
+    text-align: left;
+}
+
+.post-content .align-center {
+    text-align: center;
+}
+
+.post-content .align-right {
+    text-align: right;
 }
 
 .post-content th {
@@ -1043,14 +1020,14 @@ main {
     justify-content: flex-start;
     flex-wrap: wrap;
     align-items: center;
-    gap: 15px;
+    gap: var(--space-md);
 }
 
 .meta-date {
     font-family: var(--font-mono);
     font-size: 0.9rem;
-    padding: 3px 6px;
-    border-radius: 4px;
+    padding: 3px var(--space-sm);
+    border-radius: var(--radius-sm);
     background-color: var(--color-code-bg);
     border: 1px solid var(--color-main-border);
     opacity: 1;
@@ -1076,7 +1053,7 @@ main {
 .meta-tags .tags-list {
     display: inline-flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: var(--space-sm);
     padding: 0;
     margin: 0;
     list-style: none;
@@ -1094,11 +1071,11 @@ main {
 .meta-tags .tag-badge {
     color: var(--color-main-subtext);
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: color 0.2s, border-color 0.2s, background-color 0.2s;
     font-family: var(--font-sans);
     font-size: 0.9rem;
-    padding: 3px 6px;
-    border-radius: 4px;
+    padding: 3px var(--space-sm);
+    border-radius: var(--radius-sm);
     background-color: var(--color-code-bg);
     border: 1px solid var(--color-main-border);
     font-weight: 500;
@@ -1156,6 +1133,11 @@ main {
     box-shadow: none;
 }
 
+.post-title-link {
+    color: inherit;
+    text-decoration: none;
+}
+
 /* [新增] 使用伪元素模拟左侧高亮条，避免 border 交叉处的缺角 */
 .post-list-item::before {
     content: "";
@@ -1200,7 +1182,8 @@ main {
     transition: color 0.2s;
 }
 
-.post-list-item:hover .post-title {
+.post-list-item:hover .post-title-link,
+.post-title-link:focus {
     color: var(--color-primary);
 }
 
@@ -1286,7 +1269,8 @@ main {
         background-color: var(--color-link-dark);
     }
 
-    .post-list-item:hover .post-title {
+    .post-list-item:hover .post-title-link,
+    .post-title-link:focus {
         color: var(--color-link-dark);
     }
 
@@ -1312,6 +1296,18 @@ main {
     flex-wrap: wrap;
     gap: var(--space-sm);
     margin-top: var(--space-xl);
+}
+
+.tag-count {
+    color: var(--color-main-subtext);
+    font-size: 0.9rem;
+    margin: 0 0 var(--space-lg);
+}
+
+.section-divider {
+    border: 0;
+    border-top: 1px solid var(--color-main-border);
+    margin: var(--space-xl) 0;
 }
 
 .tag-cloud-item {
@@ -1381,11 +1377,28 @@ main {
 .archive-item {
     display: flex;
     align-items: baseline;
+    position: relative;
     padding: var(--space-sm) var(--space-md);
     border-bottom: 1px dashed var(--color-main-border);
     transition: background-color 0.2s, border-color 0.2s;
     border-radius: 0;
     margin-bottom: 5px;
+}
+
+.archive-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: -1px;
+    width: 4px;
+    background-color: transparent;
+    transition: background-color 0.2s;
+}
+
+.archive-item:hover::before,
+.archive-item:focus-within::before {
+    background-color: var(--color-primary);
 }
 
 .archive-item:hover {
@@ -1400,6 +1413,11 @@ main {
 @media (prefers-color-scheme: dark) {
     .archive-item:hover {
         background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .archive-item:hover::before,
+    .archive-item:focus-within::before {
+        background-color: var(--color-link-dark);
     }
 }
 
@@ -1498,40 +1516,39 @@ footer {
     color: var(--color-main-subtext);
     margin: 0 var(--space-sm);
     display: inline-block;
-    padding: 2px var(--space-sm);
-    border-radius: var(--radius-sm);
-    background-color: rgba(0, 0, 0, 0.02);
-    transition: color 0.2s, background-color 0.2s;
+    padding: 0;
+    background-color: transparent;
+    transition: color 0.2s, text-decoration-color 0.2s;
 }
 
 .footer-content a:hover {
     color: var(--color-primary);
-    background-color: rgba(0, 121, 107, 0.08);
+    text-decoration-line: underline;
+    text-decoration-color: currentColor;
 }
 
 .footer-links a {
     color: var(--color-main-subtext);
     margin: 0 var(--space-sm);
     display: inline-block;
-    padding: 2px var(--space-sm);
-    border-radius: var(--radius-sm);
-    background-color: rgba(0, 0, 0, 0.02);
-    transition: color 0.2s, background-color 0.2s;
+    padding: 0;
+    background-color: transparent;
+    transition: color 0.2s, text-decoration-color 0.2s;
 }
 
 .footer-links a:hover {
     color: var(--color-primary);
-    background-color: rgba(0, 121, 107, 0.08);
+    text-decoration-line: underline;
+    text-decoration-color: currentColor;
 }
 
 @media (prefers-color-scheme: dark) {
     .footer-links a {
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: transparent;
     }
 
     .footer-links a:hover {
         color: var(--color-link-dark);
-        background-color: rgba(255, 255, 255, 0.1);
     }
 }
 
@@ -1666,11 +1683,11 @@ button:focus,
     h4,
     h5,
     h6 {
-        scroll-margin-top: 130px;
+        scroll-margin-top: var(--header-offset-mobile);
     }
 
     .post-list-item {
-        padding: 20px 15px;
+        padding: var(--space-lg) var(--space-md);
     }
 }
 
@@ -1778,9 +1795,9 @@ button:focus,
 @media (max-width: 600px) {
     .post-navigation {
         flex-direction: column;
-        gap: 15px;
-        margin-top: 40px;
-        padding-top: 20px;
+        gap: var(--space-md);
+        margin-top: var(--space-xl);
+        padding-top: var(--space-lg);
     }
 
     .nav-link.nav-next {
@@ -2550,7 +2567,7 @@ button:focus,
 /* 404 容器 */
 .error-container {
     text-align: center;
-    padding: 40px 20px;
+    padding: var(--space-xl) var(--space-lg);
     animation: fadeIn 0.8s ease-out;
 }
 
@@ -2562,7 +2579,7 @@ button:focus,
     font-weight: 700;
     line-height: 1;
     color: var(--color-primary);
-    margin-bottom: 20px;
+    margin-bottom: var(--space-lg);
     position: relative;
     display: inline-block;
 
@@ -2572,11 +2589,11 @@ button:focus,
 
 /* 装饰性分割线 */
 .error-divider {
-    width: 60px;
+    width: 64px;
     height: 4px;
     background-color: var(--color-main-border);
-    margin: 20px auto;
-    border-radius: 2px;
+    margin: var(--space-lg) auto;
+    border-radius: var(--radius-pill);
 }
 
 /* 错误主标题 */
@@ -2584,7 +2601,7 @@ button:focus,
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--color-main-text);
-    margin: 0 0 15px 0;
+    margin: 0 0 var(--space-md) 0;
     letter-spacing: -0.02em;
 }
 
@@ -2592,7 +2609,7 @@ button:focus,
 .error-desc {
     font-size: 1.1rem;
     color: var(--color-main-subtext);
-    margin-bottom: 40px;
+    margin-bottom: var(--space-xl);
     line-height: 1.6;
 }
 
@@ -2694,21 +2711,21 @@ button:focus,
 }
 /* 修复锚点定位被头部遮挡的问题 */
 html {
-    scroll-margin-top: 90px;
+    scroll-margin-top: var(--header-offset);
 }
 
 /* 对于特定的锚点，确保它们不会被头部遮挡 */
 :target {
-    scroll-margin-top: 90px;
+    scroll-margin-top: var(--header-offset);
 }
 
 /* 如果使用id锚点，可以专门设置 */
 #top {
     scroll-margin-top: 0;
     position: relative;
-    top: -90px;
+    top: calc(var(--header-offset) * -1);
     display: block;
-    height: 90px;
+    height: var(--header-offset);
     visibility: hidden;
 }
 

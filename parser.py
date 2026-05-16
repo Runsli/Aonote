@@ -232,6 +232,18 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
 
         # 2. 表格包裹器 (Table Wrapper)
         for table in soup.find_all('table'):
+            # 将 Markdown 表格对齐生成的 inline style 转成 class，便于 CSP 去掉 unsafe-inline。
+            for cell in table.find_all(['th', 'td']):
+                style = cell.get('style', '')
+                if 'text-align' in style:
+                    if 'center' in style:
+                        cell['class'] = cell.get('class', []) + ['align-center']
+                    elif 'right' in style:
+                        cell['class'] = cell.get('class', []) + ['align-right']
+                    elif 'left' in style:
+                        cell['class'] = cell.get('class', []) + ['align-left']
+                    del cell['style']
+
             # 找到 table 标签的父元素
             parent = table.parent
             if not parent:
