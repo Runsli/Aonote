@@ -7,10 +7,22 @@ from typing import Dict, List, Optional, Set, Tuple
 from urllib.parse import urlparse
 
 import config
+from bs4 import BeautifulSoup
 
 
 ERROR_PREFIX = "ERROR"
 WARNING_PREFIX = "WARN"
+GENERIC_LINK_TEXT = {
+    "click here",
+    "here",
+    "read more",
+    "more",
+    "details",
+    "点击这里",
+    "这里",
+    "更多",
+    "详情",
+}
 
 
 class PageParser(HTMLParser):
@@ -104,12 +116,87 @@ def _path_exists_for_url(build_dir: Path, url_path: str) -> bool:
     return False
 
 
+def _line_for_element(html: str, element) -> int:
+    marker = str(element)[:80]
+    index = html.find(marker)
+    if index == -1:
+        return 0
+    return html.count("\n", 0, index) + 1
+
+
+def _visible_text(element) -> str:
+    for hidden in element.select("[aria-hidden='true']"):
+        hidden.extract()
+    return " ".join(element.get_text(" ", strip=True).split())
+
+
+def _check_accessibility(html: str, page_label: str) -> Tuple[List[str], List[str]]:
+    errors: List[str] = []
+    warnings: List[str] = []
+    soup = BeautifulSoup(html, "html.parser")
+
+    ids: Dict[str, int] = {}
+    for element in soup.find_all(attrs={"id": True}):
+        element_id = element.get("id", "").strip()
+        if not element_id:
+            continue
+        ids[element_id] = ids.get(element_id, 0) + 1
+    for element_id, count in ids.items():
+        if count > 1:
+            errors.append(f"{page_label}: duplicate id {element_id!r}")
+
+    h1_count = len(soup.find_all("h1"))
+    if h1_count == 0:
+        warnings.append(f"{page_label}: missing <h1>")
+    elif h1_count > 1:
+        warnings.append(f"{page_label}: contains {h1_count} <h1> elements")
+
+    previous_heading_level: Optional[int] = None
+    for heading in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"]):
+        level = int(heading.name[1])
+        if previous_heading_level and level > previous_heading_level + 1:
+            line = _line_for_element(html, heading)
+            suffix = f" near line {line}" if line else ""
+            warnings.append(
+                f"{page_label}: heading level jumps from h{previous_heading_level} to h{level}{suffix}"
+            )
+        previous_heading_level = level
+
+    for img in soup.find_all("img"):
+        alt = img.get("alt")
+        src = img.get("src", "")
+        if alt is None:
+            errors.append(f"{page_label}: image missing alt text {src!r}")
+        elif alt.strip().lower() in {"图片", "示例图片", "image", "photo", "picture"}:
+            warnings.append(f"{page_label}: image alt text is too generic {src!r}")
+
+    for element in soup.find_all(attrs={"aria-label": True}):
+        if not element.get("aria-label", "").strip():
+            errors.append(f"{page_label}: empty aria-label on <{element.name}>")
+
+    for link in soup.find_all("a"):
+        href = link.get("href", "").strip()
+        text = _visible_text(BeautifulSoup(str(link), "html.parser"))
+        aria_label = link.get("aria-label", "").strip()
+        title = link.get("title", "").strip()
+        accessible_name = aria_label or text or title
+        if not accessible_name and href and not href.startswith("#"):
+            errors.append(f"{page_label}: link has no accessible text {href!r}")
+        elif accessible_name.strip().lower() in GENERIC_LINK_TEXT:
+            warnings.append(f"{page_label}: link text is too generic {href!r}")
+
+    return errors, warnings
+
+
 def _check_html_page(build_dir: Path, html_path: Path) -> Tuple[List[str], List[str]]:
     errors: List[str] = []
     warnings: List[str] = []
     html = html_path.read_text(encoding="utf-8", errors="replace")
     parser = PageParser()
     parser.feed(html)
+    a11y_errors, a11y_warnings = _check_accessibility(html, html_path.relative_to(build_dir).as_posix())
+    errors.extend(a11y_errors)
+    warnings.extend(a11y_warnings)
 
     page_label = html_path.relative_to(build_dir).as_posix()
     current_url_path = _site_path_for_html(build_dir, html_path)
@@ -147,9 +234,6 @@ def _check_html_page(build_dir: Path, html_path: Path) -> Tuple[List[str], List[
             errors.append(f"{page_label}: 404 page should include robots noindex")
     elif not canonicals:
         errors.append(f"{page_label}: missing canonical link")
-
-    if not parser.has_h1:
-        warnings.append(f"{page_label}: missing <h1>")
 
     for tag, attrs in parser.tags:
         if tag == "a":
