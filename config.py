@@ -192,5 +192,6 @@ ABOUT_PAGE = 'about.md'
 # 特殊文件名称
 SITEMAP_FILE = 'sitemap.xml'
 RSS_FILE = 'rss.xml'
+ATOM_FILE = 'atom.xml'
 ARCHIVE_FILE = 'archive.html' 
 TAGS_LIST_FILE = 'tags.html'

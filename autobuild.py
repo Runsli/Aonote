@@ -638,7 +638,7 @@ def build_site():
     # 2. 生成列表页 (应用增量逻辑)
     # ⭐ 修复: 只要 posts_data_changed 为 True，或者主题/模板文件有变动，就重建所有列表页
     if not old_manifest or posts_data_changed or theme_changed: # <-- 关键修改
-        print("   -> [REBUILDING] Index, Archive, Tags, RSS (Post data or Theme changed)")
+        print("   -> [REBUILDING] Index, Archive, Tags, RSS, Atom (Post data or Theme changed)")
         
         generator.generate_index_html(final_parsed_posts, global_build_time_cn) 
         generator.generate_archive_html(final_parsed_posts, global_build_time_cn) 
@@ -655,9 +655,11 @@ def build_site():
             f.write(generator.generate_sitemap(final_parsed_posts))
         with open(os.path.join(config.BUILD_DIR, config.RSS_FILE), 'w', encoding='utf-8') as f:
             f.write(generator.generate_rss(final_parsed_posts))
+        with open(os.path.join(config.BUILD_DIR, config.ATOM_FILE), 'w', encoding='utf-8') as f:
+            f.write(generator.generate_atom(final_parsed_posts))
             
     else:
-        print("   -> [SKIPPED] Index, Archive, Tags, RSS (No post data or Theme change)")
+        print("   -> [SKIPPED] Index, Archive, Tags, RSS, Atom (No post data or Theme change)")
 
     print("\n[post] Running site health checks...")
     if not check_site.run_checks(config.BUILD_DIR):

@@ -1,5 +1,6 @@
 import posixpath
 import sys
+import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
@@ -182,6 +183,22 @@ def _check_html_page(build_dir: Path, html_path: Path) -> Tuple[List[str], List[
     return errors, warnings
 
 
+def _check_xml_file(root: Path, filename: str, expected_root_suffix: str) -> List[str]:
+    path = root / filename
+    if not path.is_file():
+        return [f"missing required file: {filename}"]
+
+    try:
+        tree = ET.parse(path)
+    except ET.ParseError as exc:
+        return [f"{filename}: invalid XML ({exc})"]
+
+    root_tag = tree.getroot().tag
+    if not root_tag.endswith(expected_root_suffix):
+        return [f"{filename}: unexpected root element {root_tag!r}"]
+    return []
+
+
 def run_checks(build_dir: str = config.BUILD_DIR) -> bool:
     root = Path(build_dir)
     errors: List[str] = []
@@ -201,9 +218,12 @@ def run_checks(build_dir: str = config.BUILD_DIR) -> bool:
         errors.extend(page_errors)
         warnings.extend(page_warnings)
 
-    for required_file in (config.SITEMAP_FILE, config.RSS_FILE, "robots.txt"):
+    for required_file in ("robots.txt",):
         if not (root / required_file).is_file():
             errors.append(f"missing required file: {required_file}")
+    errors.extend(_check_xml_file(root, config.SITEMAP_FILE, "urlset"))
+    errors.extend(_check_xml_file(root, config.RSS_FILE, "rss"))
+    errors.extend(_check_xml_file(root, config.ATOM_FILE, "feed"))
 
     for warning in warnings:
         print(f"{WARNING_PREFIX}: {warning}")

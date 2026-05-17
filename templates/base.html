@@ -29,6 +29,7 @@
     <meta name="twitter:description" content="{{blog_description}}">
     <link rel="stylesheet" href="{{site_root}}/assets/{{css_filename}}">
     <link rel="alternate" type="application/rss+xml" title="{{blog_title}} RSS Feed" href="{{site_root}}/rss.xml">
+    <link rel="alternate" type="application/atom+xml" title="{{blog_title}} Atom Feed" href="{{site_root}}/atom.xml">
 
 </head>
 
@@ -101,7 +102,7 @@
                     {% endif %}
 
                     {%- endif -%}
-                    {%- if page_id != 'post' and page_id != 'tag' -%}
+                    {%- if page_id != 'post' and page_id != 'tag' and page_id != 'feed' -%}
                     <h1 class="visually-hidden">{{page_title}}</h1>
                     {%- endif -%}
                 </div>

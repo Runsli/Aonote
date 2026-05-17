@@ -9,7 +9,7 @@ PureMo-Blog 是一个用 Python 编写的极简静态博客生成器。它把 `m
 - **纯静态输出**：构建结果位于 `_site/`，可以直接部署到 Vercel、Netlify、GitHub Pages、Cloudflare Pages 等静态托管平台。
 - **严格 no-JS 取向**：模板不输出可执行脚本，结构化数据使用 Microdata，部署配置中也声明了 `script-src 'none'`。
 - **Markdown 写作体验**：支持 Front Matter、目录、代码高亮、表格、任务列表、提示块、删除线等常用语法。
-- **SEO 与分享信息**：自动生成 `sitemap.xml`、`robots.txt`、`rss.xml`，页面包含 canonical、Open Graph、Twitter Card 与文章时间元信息。
+- **SEO 与分享信息**：自动生成 `sitemap.xml`、`robots.txt`、`rss.xml`、`atom.xml`，页面包含 canonical、Open Graph、Twitter Card 与文章时间元信息。
 - **无障碍与性能优化**：包含跳转主内容链接、暗色模式、减少动态效果适配、图片懒加载、异步解码、CSS 压缩与正确的 404 页面。
 - **构建后健康检查**：构建结束后自动检查 no-JS、站内链接、图片资源和基础 SEO 元信息。
 

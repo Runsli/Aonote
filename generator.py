@@ -131,6 +131,7 @@ def make_internal_url(path: str) -> str:
     # 移除 .html 后缀，除非是特殊文件
     if normalized_path.lower().endswith('.html') and \
        not normalized_path.lower().endswith(config.RSS_FILE) and \
+       not normalized_path.lower().endswith(config.ATOM_FILE) and \
        not normalized_path.lower().endswith(config.SITEMAP_FILE) and \
        not normalized_path.lower() == '/404.html':
         normalized_path = normalized_path[:-5]
@@ -141,6 +142,8 @@ def make_internal_url(path: str) -> str:
         # 404 页面通常不需要 url 后缀，或者保持原样
         pass 
     elif normalized_path.lower().endswith(config.RSS_FILE):
+        pass
+    elif normalized_path.lower().endswith(config.ATOM_FILE):
         pass
     elif normalized_path.lower().endswith(config.SITEMAP_FILE):
         pass
@@ -423,7 +426,9 @@ def generate_feed_html(sorted_posts: List[Dict[str, Any]], build_time_info: str)
 
         base_url = config.BASE_URL.rstrip('/')
         rss_path = make_internal_url(config.RSS_FILE)
+        atom_path = make_internal_url(config.ATOM_FILE)
         rss_url = f"{base_url}{rss_path}"
+        atom_url = f"{base_url}{atom_path}"
         recent_posts = [p for p in sorted_posts if not is_post_hidden(p)][:5]
 
         feed_html = f"""
@@ -432,8 +437,10 @@ def generate_feed_html(sorted_posts: List[Dict[str, Any]], build_time_info: str)
             <p class="feed-intro">{i18n['feed_intro']}</p>
 
             <div class="feed-card">
-                <p class="feed-label">{i18n['feed_url_label']}</p>
+                <p class="feed-label">{i18n.get('feed_rss_url_label', i18n['feed_url_label'])}</p>
                 <p><a href="{rss_path}" class="feed-url">{rss_url}</a></p>
+                <p class="feed-label">{i18n.get('feed_atom_url_label', 'Atom URL')}</p>
+                <p><a href="{atom_path}" class="feed-url">{atom_url}</a></p>
             </div>
         """
 
@@ -530,7 +537,7 @@ def generate_sitemap(parsed_posts: List[Dict[str, Any]]) -> str:
     urls = []
     base_url = config.BASE_URL.rstrip('/')
     
-    for path, prio in [('/', '1.0'), ('/archive', '0.8'), ('/tags', '0.8'), ('/feed', '0.6'), ('/404', '0.1'), (config.RSS_FILE, '0.1')]:
+    for path, prio in [('/', '1.0'), ('/archive', '0.8'), ('/tags', '0.8'), ('/feed', '0.6'), ('/404', '0.1'), (config.RSS_FILE, '0.1'), (config.ATOM_FILE, '0.1')]:
         urls.append(f"<url><loc>{base_url}{make_internal_url(path)}</loc><priority>{prio}</priority></url>")
 
     if os.path.exists(os.path.join(config.BUILD_DIR, 'about', 'index.html')):
@@ -552,20 +559,82 @@ def generate_sitemap(parsed_posts: List[Dict[str, Any]]) -> str:
 
     return f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{"".join(urls)}</urlset>'
 
+def _feed_datetime(post: Dict[str, Any]) -> datetime:
+    return datetime.combine(post['date'], datetime.min.time(), tzinfo=timezone.utc)
+
+
+def _feed_updated_at(visible_posts: List[Dict[str, Any]]) -> datetime:
+    dated_posts = [post for post in visible_posts if post.get('date')]
+    if not dated_posts:
+        return datetime.now(timezone.utc)
+    return max(_feed_datetime(post) for post in dated_posts)
+
+
+def _feed_posts(parsed_posts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    return [post for post in parsed_posts if not is_post_hidden(post) and post.get('link')]
+
+
 def generate_rss(parsed_posts: List[Dict[str, Any]]) -> str:
     """生成 RSS Feed"""
     items = []
     base_url = config.BASE_URL.rstrip('/')
-    visible_posts = [p for p in parsed_posts if not is_post_hidden(p)]
+    visible_posts = _feed_posts(parsed_posts)
     
     for post in visible_posts[:10]:
-        if not post.get('link'): continue
         link = f"{base_url}{make_internal_url(post['link'])}"
-        pub_date = datetime.combine(post['date'], datetime.min.time(), tzinfo=timezone.utc).strftime('%a, %d %b %Y %H:%M:%S +0000') 
-        items.append(f"<item><title>{post['title']}</title><link>{link}</link><pubDate>{pub_date}</pubDate><guid isPermaLink=\"true\">{link}</guid><description><![CDATA[{post['content_html']}]]></description></item>")
+        pub_date = _feed_datetime(post).strftime('%a, %d %b %Y %H:%M:%S +0000')
+        categories = "".join(f"<category>{html.escape(tag['name'])}</category>" for tag in post.get('tags', []))
+        summary = html.escape(post.get('excerpt') or config.BLOG_DESCRIPTION)
+        items.append(
+            f"<item>"
+            f"<title>{html.escape(post['title'])}</title>"
+            f"<link>{link}</link>"
+            f"<pubDate>{pub_date}</pubDate>"
+            f"<guid isPermaLink=\"true\">{link}</guid>"
+            f"<dc:creator>{html.escape(config.BLOG_AUTHOR)}</dc:creator>"
+            f"{categories}"
+            f"<description>{summary}</description>"
+            f"<content:encoded><![CDATA[{post['content_html']}]]></content:encoded>"
+            f"</item>"
+        )
     
     rss_link = make_internal_url(config.RSS_FILE) 
-    return f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>{config.BLOG_TITLE}</title><link>{base_url}{make_internal_url("/")}</link><description>{config.BLOG_DESCRIPTION}</description><language>zh-cn</language><atom:link href="{base_url}{rss_link}" rel="self" type="application/rss+xml" /><lastBuildDate>{datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S +0000")}</lastBuildDate>{"".join(items)}</channel></rss>'
+    atom_link = make_internal_url(config.ATOM_FILE)
+    language = get_i18n().get('html_lang', 'zh-cn')
+    updated_at = _feed_updated_at(visible_posts).strftime('%a, %d %b %Y %H:%M:%S +0000')
+    return f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>{html.escape(config.BLOG_TITLE)}</title><link>{base_url}{make_internal_url("/")}</link><description>{html.escape(config.BLOG_DESCRIPTION)}</description><language>{language}</language><atom:link href="{base_url}{rss_link}" rel="self" type="application/rss+xml" /><atom:link href="{base_url}{atom_link}" rel="alternate" type="application/atom+xml" /><lastBuildDate>{updated_at}</lastBuildDate>{"".join(items)}</channel></rss>'
+
+
+def generate_atom(parsed_posts: List[Dict[str, Any]]) -> str:
+    """生成 Atom Feed。"""
+    entries = []
+    base_url = config.BASE_URL.rstrip('/')
+    site_url = f"{base_url}{make_internal_url('/')}"
+    atom_url = f"{base_url}{make_internal_url(config.ATOM_FILE)}"
+    rss_url = f"{base_url}{make_internal_url(config.RSS_FILE)}"
+    visible_posts = _feed_posts(parsed_posts)
+    updated_at = _feed_updated_at(visible_posts).isoformat().replace('+00:00', 'Z')
+
+    for post in visible_posts[:10]:
+        link = f"{base_url}{make_internal_url(post['link'])}"
+        published = _feed_datetime(post).isoformat().replace('+00:00', 'Z')
+        categories = "".join(f"<category term=\"{html.escape(tag['name'])}\" />" for tag in post.get('tags', []))
+        summary = html.escape(post.get('excerpt') or config.BLOG_DESCRIPTION)
+        entries.append(
+            f"<entry>"
+            f"<title>{html.escape(post['title'])}</title>"
+            f"<link href=\"{link}\" />"
+            f"<id>{link}</id>"
+            f"<published>{published}</published>"
+            f"<updated>{published}</updated>"
+            f"<author><name>{html.escape(config.BLOG_AUTHOR)}</name></author>"
+            f"{categories}"
+            f"<summary>{summary}</summary>"
+            f"<content type=\"html\">{html.escape(post['content_html'])}</content>"
+            f"</entry>"
+        )
+
+    return f'<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="{get_i18n().get("html_lang", "zh-cn")}"><title>{html.escape(config.BLOG_TITLE)}</title><subtitle>{html.escape(config.BLOG_DESCRIPTION)}</subtitle><link href="{site_url}" rel="alternate" type="text/html" /><link href="{atom_url}" rel="self" type="application/atom+xml" /><link href="{rss_url}" rel="alternate" type="application/rss+xml" /><id>{site_url}</id><updated>{updated_at}</updated><author><name>{html.escape(config.BLOG_AUTHOR)}</name></author>{"".join(entries)}</feed>'
 
 def generate_page_html(content_html: str, page_title: str, page_id: str, canonical_path_with_html: str, build_time_info: str):
     """生成通用页面 (已修复：404页面生成在根目录)"""
