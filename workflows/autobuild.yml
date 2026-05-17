@@ -17,8 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     
     # ------------------------------------------------------------------
-    # 【关键修改 1】配置权限：部署 Pages 需要 pages 和 id-token 权限
-    # [Key change 1] Permissions required for GitHub Pages OIDC deploy
+    # 配置权限：部署 Pages 需要 pages 和 id-token / Permissions for GitHub Pages OIDC deploy
     # ------------------------------------------------------------------
     permissions:
       contents: write   # 允许提交 .build_manifest.json 回仓库 / Commit manifest back to repo
@@ -26,8 +25,7 @@ jobs:
       id-token: write   # 必须：用于 OIDC 验证 / Required for OIDC auth
       
     # ------------------------------------------------------------------
-    # 【关键修改 2】设置 Pages 部署环境
-    # [Key change 2] GitHub Pages deployment environment
+    # 设置 Pages 部署环境 / GitHub Pages deployment environment
     # ------------------------------------------------------------------
     environment:
       name: github-pages
@@ -58,8 +56,7 @@ jobs:
           ${{ runner.os }}-pip-
         
     # ------------------------------------------------------------------
-    # ⭐ 核心修复：确保依赖总是被安装
-    # Core fix: always run pip install (cache may skip re-download only)
+    # 确保依赖安装（缓存命中时仍执行 pip install）/ Always run pip install
     # ------------------------------------------------------------------
     - name: Install Python Dependencies (Ensure YAML is installed)
       # 即使缓存命中，也应运行此步骤。Pip 会在缓存命中的情况下跳过重新下载，但会完成安装到虚拟环境的步骤。
@@ -67,8 +64,7 @@ jobs:
       run: pip install -r requirements.txt
       
     # ------------------------------------------------------------------
-    # 【新增修复】强制完全重建：如果 requirements.txt 更改，则删除 manifest
-    # Force full rebuild when requirements.txt changes
+    # requirements.txt 变更时删除 manifest 以强制全量构建 / Force full rebuild when deps change
     # ------------------------------------------------------------------
     - name: Force Full Build if Requirements Changed
       run: |

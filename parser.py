@@ -739,8 +739,7 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
     content_html = md.convert(content_markdown)
     
     # -------------------------------------------------------------------------
-    # 【重构】UI：懒加载图像、语义化脚注与代码块封装等
-    # Post-render DOM surgery for lazy assets, captions, wrappers, semantics
+    # UI 后处理：懒加载图像、脚注语义化、代码块封装等 / Post-render DOM: lazy images, footnotes, code blocks
     # -------------------------------------------------------------------------
     # 使用 BeautifulSoup 做可控的 AST 改写 / Trusted HTML rewriting via BeautifulSoup
     if '<img' in content_html or '<table' in content_html or '<pre' in content_html or 'arithmatex' in content_html or 'footnote' in content_html or 'task-list' in content_html:

@@ -173,7 +173,7 @@ MARKDOWN_EXTENSION_CONFIGS = {
         'linenums': False,
         'css_class': CODE_HIGHLIGHT_CLASS, # 强制指定类名为 'highlight' / Force highlight class name
         'use_pygments': True,          # 强制使用 Pygments / Always use Pygments
-        'noclasses': False,            # ⭐ 关键修复：改为 False，使用 CSS 类而不是内联样式 / Use CSS classes, not inline styles
+        'noclasses': False,            # 使用 CSS 类而非内联样式 / Use CSS classes, not inline styles
         'guess_lang': True,            # 自动猜测语言 / Guess code language
     },
     'pymdownx.tasklist': {

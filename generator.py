@@ -663,20 +663,18 @@ def generate_atom(parsed_posts: List[Dict[str, Any]]) -> str:
     return f'<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="{get_i18n().get("html_lang", "zh-cn")}"><title>{html.escape(config.BLOG_TITLE)}</title><subtitle>{html.escape(config.BLOG_DESCRIPTION)}</subtitle><link href="{site_url}" rel="alternate" type="text/html" /><link href="{atom_url}" rel="self" type="application/atom+xml" /><link href="{rss_url}" rel="alternate" type="application/rss+xml" /><id>{site_url}</id><updated>{updated_at}</updated><author><name>{html.escape(config.BLOG_AUTHOR)}</name></author>{"".join(entries)}</feed>'
 
 def generate_page_html(content_html: str, page_title: str, page_id: str, canonical_path_with_html: str, build_time_info: str):
-    """生成通用页面 (已修复：404页面生成在根目录)
+    """生成通用页面（404 输出在站点根目录）
     Generate generic pages (404 is written to site root as 404.html)."""
     try:
-        # --- 修复开始：针对 404 页面的特殊路径处理 / 404 output path fix ---
         if page_id == '404':
-            # 404 页面必须生成在根目录，文件名为 404.html / 404 must live at _site/404.html
+            # 404 生成在根目录 404.html / 404 at _site/404.html
             output_dir = config.BUILD_DIR
             output_path = os.path.join(output_dir, '404.html')
         else:
-            # 其他页面（如 about）生成在子目录，如 /about/index.html / Other pages use /slug/index.html
+            # 其他页面使用 /slug/index.html / Other pages use /slug/index.html
             output_dir = os.path.join(config.BUILD_DIR, page_id)
             os.makedirs(output_dir, exist_ok=True)
             output_path = os.path.join(output_dir, 'index.html')
-        # --- 修复结束 / End 404 path fix ---
         
         template = env.get_template('base.html')
         canonical_path = make_internal_url(canonical_path_with_html) 

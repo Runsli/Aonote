@@ -25,7 +25,7 @@ except ImportError:
     print("Warning: csscompressor not installed, using basic compression")
 
 # =========================================================================
-# 【关键修复】将组合后的输出目录变量移到此处，以解决 config 模块属性缺失的问题 / [Critical fix] Move combined output dir vars here to fix missing config attributes
+# 组合输出目录变量定义在模块顶层，避免 config 属性缺失 / Combined output dir vars at module level
 # =========================================================================
 # 这些变量现在是 autobuild.py 模块的全局变量，确保可用 / These are module-level globals in autobuild.py for reliable access
 POSTS_OUTPUT_DIR = os.path.join(config.BUILD_DIR, config.POSTS_DIR_NAME)
@@ -34,7 +34,7 @@ STATIC_OUTPUT_DIR = os.path.join(config.BUILD_DIR, config.STATIC_DIR)
 # =========================================================================
 
 
-# [恢复] 定义清单文件路径 / [Restored] Manifest file path
+# 增量构建清单文件路径 / Manifest file path for incremental builds
 MANIFEST_FILE = os.path.join(os.path.dirname(__file__), '.build_manifest.json')
 
 # 定义 UTC+8 时区信息 / UTC+8 timezone info
@@ -85,7 +85,7 @@ def get_full_content_hash(filepath: str) -> str:
         return ""
     return h.hexdigest()
 
-# [新增] 辅助函数：计算文件哈希 / [New] Helper: compute file hash
+# 计算文件哈希 / Compute file content hash
 def get_file_hash(filepath: str) -> Optional[str]:
     """计算文件的 SHA256 哈希值。
 
@@ -138,7 +138,7 @@ def post_sort_key(post: Dict[str, Any]):
     stable_slug = str(post.get('slug') or post.get('link') or '').lower()
     return post['date'], stable_slug
 
-# [修复后的 FUNCTION] 获取文件的最后修改时间 (Git -> Filesystem -> Fallback with Microseconds) / [Fixed] Get file mtime (Git -> filesystem -> fallback with microseconds)
+# 获取文件最后修改时间 (Git -> 文件系统 -> 回退) / Get file mtime (Git -> filesystem -> fallback)
 def format_file_mod_time(filepath: str) -> str:
     """
     获取文件的最后修改时间。
@@ -152,13 +152,13 @@ def format_file_mod_time(filepath: str) -> str:
     def format_dt(dt: datetime, source: str) -> str:
         # 确保 datetime 对象带有正确的时区信息 / Ensure datetime has correct timezone info
         if dt.tzinfo is None or dt.tzinfo.utcoffset(dt) is None:
-            # ⭐ 关键修复 1: 将 Naive 对象（如 os.path.getmtime 的输出）视为 UTC，再转换为目标时区 UTC+8 / [Critical fix 1] Treat naive datetimes (e.g. os.path.getmtime) as UTC, convert to UTC+8
+            # 将 Naive datetime 视为 UTC，再转换到 UTC+8 / Treat naive datetimes as UTC, convert to UTC+8
             dt = dt.replace(tzinfo=timezone.utc).astimezone(TIMEZONE_INFO) 
         else:
             # 否则直接转换为 UTC+8 / Otherwise convert directly to UTC+8
             dt = dt.astimezone(TIMEZONE_INFO)
             
-        # [核心修复] 使用微秒 (%f) 格式化时间 / [Core fix] Format time with microseconds (%f)
+        # 使用微秒 (%f) 格式化时间 / Format time with microseconds (%f)
         time_str = dt.strftime('%Y-%m-%d %H:%M:%S.%f')
         
         # 移除末尾的零和点，使输出更简洁，但保留非零微秒 / Strip trailing zeros/dots; keep non-zero microseconds
@@ -189,7 +189,7 @@ def format_file_mod_time(filepath: str) -> str:
     # --- 2. 尝试获取文件系统修改时间 / Try filesystem modification time (secondary fallback) ---
     try:
         timestamp = os.path.getmtime(filepath)
-        # ⭐ 关键修复 2: 明确将时间戳转换为 UTC time-zone aware 对象 / [Critical fix 2] Convert timestamp to UTC timezone-aware datetime
+        # 将时间戳转换为 UTC timezone-aware 对象 / Convert timestamp to UTC-aware datetime
         fs_mtime = datetime.fromtimestamp(timestamp, tz=timezone.utc)
         return format_dt(fs_mtime, 'Filesystem')
         
@@ -287,9 +287,9 @@ def build_site():
     # -------------------------------------------------------------------------
     print("[1/5] Preparing build directory and loading manifest...")
     
-    # [关键修复: 移除 shutil.rmtree] 确保目录存在，不清理，从而保留上次的构建文件 / [Critical fix: no shutil.rmtree] Create dirs without wiping prior build output
+    # 确保目录存在，不 rmtree 清理以保留上次构建产物 / Create dirs without wiping prior build output
     os.makedirs(config.BUILD_DIR, exist_ok=True) 
-    # !!! 引用当前文件顶层定义的变量，修复 AttributeError !!! / Reference module-level vars here to fix AttributeError
+    # 引用模块顶层定义的输出目录变量 / Reference module-level output dir vars
     os.makedirs(POSTS_OUTPUT_DIR, exist_ok=True) 
     os.makedirs(TAGS_OUTPUT_DIR, exist_ok=True)
     os.makedirs(STATIC_OUTPUT_DIR, exist_ok=True)
@@ -306,11 +306,11 @@ def build_site():
     posts_to_build: List[Dict[str, Any]] = [] 
     # 标志位：文章集合信息是否变化 (影响列表页、RSS、Sitemap) / Flag: post set changed (affects list pages, RSS, sitemap)
     posts_data_changed = False      
-    # ⭐ 新增标志位：主题或模板文件是否变化 / New flag: theme or template files changed
+    # 主题或模板文件是否变化 / Whether theme or template files changed
     theme_changed = False
 
     # -------------------------------------------------------------------------
-    # [2/5] 资源处理 & 主题/模板变动检查 (新增) / Assets sync plus theme/template drift detection
+    # [2/5] 资源处理 & 主题/模板变动检查 / Assets sync plus theme/template drift detection
     # -------------------------------------------------------------------------
     print("\n[2/5] Processing Assets and Checking Theme Changes...")
     assets_dir = os.path.join(config.BUILD_DIR, 'assets')
@@ -321,7 +321,7 @@ def build_site():
         shutil.copytree(config.STATIC_DIR, STATIC_OUTPUT_DIR, dirs_exist_ok=True)
 
     # -----------------------------------------------------------
-    # ⭐ 修复: 检查 CSS 文件变动，并设置 theme_changed / Fix: detect CSS changes and set theme_changed
+    # 检查 CSS 变动并设置 theme_changed / Detect CSS changes and set theme_changed
     # -----------------------------------------------------------
     css_source = 'assets/style.css'
     if os.path.exists(css_source):
@@ -359,7 +359,7 @@ def build_site():
         config.CSS_FILENAME = 'style.css'
 
     # -----------------------------------------------------------
-    # ⭐ 修复: 检查 base.html 模板文件变动，并设置 theme_changed / Fix: detect base.html changes and set theme_changed
+    # 检查 base.html 变动并设置 theme_changed / Detect base.html changes and set theme_changed
     # -----------------------------------------------------------
     base_template_source = os.path.join('templates', 'base.html')
     if os.path.exists(base_template_source):
@@ -374,7 +374,7 @@ def build_site():
     # -----------------------------------------------------------
     
     # =========================================================================
-    # ⭐ 核心修复: 检查所有核心 Python 文件和模板文件变动 (解决您的根本问题) / Core fix: check core Python and template file changes
+    # 检查核心 Python 与模板文件变动 / Check core Python and template file changes
     # 这一部分是解决问题的关键，确保构建逻辑更改时强制重建 / Key to forcing full rebuild when build logic changes
     # =========================================================================
     CORE_DEPENDENCIES = [
@@ -406,7 +406,7 @@ def build_site():
     # =========================================================================
 
     # =========================================================================
-    # ⭐ 新增: 复制 CNAME 文件到 _site 部署目录 (解决自定义域名问题) / New: copy CNAME into _site for custom domain
+    # 复制 CNAME 到 _site 部署目录 / Copy CNAME into _site for custom domain
     # =========================================================================
     cname_path_source = os.path.join(os.path.dirname(__file__), 'CNAME')
     cname_path_dest = os.path.join(config.BUILD_DIR, 'CNAME')
@@ -455,7 +455,7 @@ def build_site():
         # 解析内容 (即使跳过 HTML，也要解析元数据来构建列表页) / Parse content (metadata needed for list pages even if HTML skipped)
         metadata, content_md, content_html, toc_html = get_metadata_and_content(md_file)
         
-        mod_time_cn = format_file_mod_time(md_file) # 使用修复后的时间获取逻辑 / Use fixed file mtime logic
+        mod_time_cn = format_file_mod_time(md_file)  # 文件修改时间 / File modification time
 
         # 自动补全 slug 和特殊页面处理 (保持不变) / Auto-fill slug and special pages (unchanged)
         if 'slug' not in metadata:
@@ -472,7 +472,7 @@ def build_site():
                 **metadata, 'content_html': content_html, 'toc_html': '', 
                 'link': special_link, 'footer_time_info': mod_time_cn
             }
-            # ⭐ 关键修复：404 页面应使用 generate_page_html，而不是 generate_post_page / 404 must use generate_page_html, not generate_post_page
+            # 404 使用 generate_page_html，而非 generate_post_page / 404 uses generate_page_html
             if needs_rebuild_html: # 使用 needs_rebuild_html / Use needs_rebuild_html
                 generator.generate_page_html(
                     special_post['content_html'], 
@@ -492,7 +492,7 @@ def build_site():
                      **metadata, 'content_html': content_html, 'toc_html': '', 
                      'link': special_link, 'footer_time_info': mod_time_cn
                  }
-                 # ⭐ 修复: 特殊页面也需要检查 theme_changed / Fix: special pages must respect theme_changed
+                 # 特殊页面也需检查 theme_changed / Special pages respect theme_changed
                  if needs_rebuild_html: # 使用 needs_rebuild_html / Use needs_rebuild_html
                      generator.generate_page_html(
                          special_post['content_html'], special_post['title'], 
@@ -664,8 +664,8 @@ def build_site():
         generator.generate_post_page(post) 
 
     # 2. 生成列表页 (应用增量逻辑) / Generate list pages (incremental logic)
-    # ⭐ 修复: 只要 posts_data_changed 为 True，或者主题/模板文件有变动，就重建所有列表页 / Rebuild all list pages when posts_data_changed or theme/template changed
-    if not old_manifest or posts_data_changed or theme_changed: # 关键修改 / Key change
+    # posts_data_changed 或主题变动时重建列表页 / Rebuild list pages when data or theme changed
+    if not old_manifest or posts_data_changed or theme_changed:
         print("   -> [REBUILDING] Index, Archive, Tags, RSS, Atom (Post data or Theme changed)")
         
         generator.generate_index_html(final_parsed_posts, global_build_time_cn) 
@@ -694,7 +694,7 @@ def build_site():
         raise SystemExit(1)
 
     # 3. 保存新的构建清单 / Save new build manifest
-    # ⭐ 修复: 只有健康检查通过后才保存 new_manifest，避免失败构建污染增量状态 / Save manifest only after health checks pass
+    # 健康检查通过后再保存 manifest / Save manifest only after health checks pass
     save_manifest(new_manifest)
     print("   -> Manifest file updated.")
     
