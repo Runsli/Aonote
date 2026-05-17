@@ -148,3 +148,45 @@ Original link: <a href="{url}">{url}</a>''',
 
 def get_translations(language: str) -> dict:
     return TRANSLATIONS.get(language, TRANSLATIONS["zh-CN"])
+
+
+def _flatten_keys(data: dict, prefix: str = "") -> set:
+    keys = set()
+    for key, value in data.items():
+        path = f"{prefix}.{key}" if prefix else key
+        if isinstance(value, dict):
+            keys |= _flatten_keys(value, path)
+        else:
+            keys.add(path)
+    return keys
+
+
+def validate_translation_keys() -> list:
+    """校验各语言包的键是否一致；不一致时返回可读错误列表。
+
+    Return human-readable errors when locale key sets do not match."""
+    errors = []
+    locales = sorted(TRANSLATIONS.keys())
+    if len(locales) < 2:
+        return errors
+
+    reference_locale = "zh-CN" if "zh-CN" in TRANSLATIONS else locales[0]
+    reference_keys = _flatten_keys(TRANSLATIONS[reference_locale])
+    for locale in locales:
+        if locale == reference_locale:
+            continue
+        locale_keys = _flatten_keys(TRANSLATIONS[locale])
+        missing = sorted(reference_keys - locale_keys)
+        extra = sorted(locale_keys - reference_keys)
+        if missing:
+            errors.append(f"{locale} is missing keys: {', '.join(missing)}")
+        if extra:
+            errors.append(f"{locale} has extra keys: {', '.join(extra)}")
+    return errors
+
+
+if __name__ == "__main__":
+    issues = validate_translation_keys()
+    if issues:
+        raise SystemExit("\n".join(issues))
+    print("i18n translation keys are consistent across all locales.")

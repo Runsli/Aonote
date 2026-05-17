@@ -91,7 +91,7 @@
                         </div>
                     </div>
 
-                    {# 移动端目录 #}
+                    {# 移动端目录 / Mobile table of contents #}
                     {% if toc_html %}
                     <details class="mobile-toc">
                         <summary>{{i18n.toc}}</summary>
@@ -107,7 +107,7 @@
                     {%- endif -%}
                 </div>
 
-                {# --- 列表页面 (首页, 标签详情, 归档) --- #}
+                {# --- 列表页面 (首页, 标签详情, 归档) / List pages: home, tag, archive --- #}
                 {%- if page_id == 'index' or page_id == 'tag' or page_id == 'archive' -%}
 
                 {%- if page_id == 'tag' -%}
@@ -167,7 +167,7 @@
 
                 {%- endif -%}
 
-                {# --- 正文/归档/标签云内容渲染区 --- #}
+                {# --- 正文/归档/标签云内容渲染区 / Main content area --- #}
                 {%- if content_html -%}
                 {%- if page_id == 'post' -%}
                 <div class="post-content" itemprop="articleBody">
@@ -180,7 +180,7 @@
                 {%- endif -%}
                 {%- endif -%}
 
-<!-- 版权声明 -->
+<!-- 版权声明 / Post copyright notice -->
 {%- if page_id == 'post' and copyright_config.enable -%}
 <div class="post-license">
     <p>
@@ -234,7 +234,7 @@
         {{ copyright_notice(post.title, blog_author, canonical_url) | safe }}
     </p>
     
-    {# 只有当 show_standard_format 为 True 时才显示 additional_note #}
+    {# 只有当 show_standard_format 为 True 时才显示 additional_note / Show extra note when standard format is enabled #}
     {% if copyright_additional_note and copyright_config.show_standard_format %}
     <p>{{ copyright_additional_note }}</p>
     {% endif %}
@@ -247,7 +247,7 @@
 </div>
 {%- endif -%}
 
-                {# 文章上/下导航 #}
+                {# 文章上/下导航 / Previous and next post navigation #}
                 {%- if page_id == 'post' and (prev_post_nav or next_post_nav) -%}
                 <nav class="post-navigation">
                     {% if prev_post_nav %}

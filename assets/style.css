@@ -1,27 +1,27 @@
-/* --- START OF FILE style.css (FULL RESTORED VERSION) --- */
+/* --- START OF FILE style.css --- / 文件开头（完整还原版） */
 
-/* =========================================
-   A. 全局重置 & 滚动条美化
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   A. 全局重置 & 滚动条美化 / Global reset & scrollbar styling
+   小节横幅（底） / ========================================= */
 *,
 *::before,
 *::after {
     box-sizing: border-box;
 }
 
-/* 全局选中文本样式 (品牌一致性) */
+/* 全局选中文本样式 (品牌一致性) / Global text selection (brand consistency) */
 ::selection {
     background-color: var(--color-primary);
     color: #ffffff;
 }
 
-/* [修复] 代码块内选中：将 rgba(255, 255, 255, 0.2) 修改为半透明品牌色，避免白色背景看不清 */
+/* [修复] 代码块内选中：将 rgba(255, 255, 255, 0.2) 修改为半透明品牌色，避免白色背景看不清 / [Fix] Code block selection: use semi-transparent brand color instead of rgba(255,255,255,0.2) for readability on light backgrounds */
 .post-content pre ::selection {
     background-color: rgba(0, 121, 107, 0.25);
     color: inherit;
 }
 
-/* --- 自定义滚动条 --- */
+/* --- 自定义滚动条 / Custom scrollbar --- */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -45,16 +45,16 @@
         background-color: rgba(255, 255, 255, 0.2);
     }
 
-    /* [修复] 暗色模式下的选中高亮 */
+    /* [修复] 暗色模式下的选中高亮 / [Fix] Selection highlight in dark mode */
     .post-content pre ::selection {
         background-color: rgba(255, 255, 255, 0.3) !important;
         color: #ffffff !important;
     }
 }
 
-/* =========================================
-   C. 主题变量
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   C. 主题变量 / Theme variables
+   小节横幅（底） / ========================================= */
 :root {
     --color-primary: #00796b;
     --color-primary-light: #e0f2f1;
@@ -106,7 +106,7 @@
 
     --font-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, var(--font-emoji), sans-serif;
-    /* [优化] 代码等宽字体族：彻底解决 Windows 宋体问题 */
+    /* [优化] 代码等宽字体族：彻底解决 Windows 宋体问题 / [Optimize] Monospace font stack: fixes Windows SimSun fallback for code */
     --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', 'Segoe UI Mono', 'Liberation Mono', 'Menlo', Monaco, var(--font-emoji), monospace;
 }
 
@@ -122,9 +122,9 @@
     }
 }
 
-/* =========================================
-   E. 基础样式
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   E. 基础样式 / Base styles
+   小节横幅（底） / ========================================= */
 html {
     font-family: var(--font-sans);
     line-height: 1.7;
@@ -203,7 +203,7 @@ h6 {
     color: var(--color-main-text);
     scroll-margin-top: var(--header-offset);
     overflow-wrap: break-word;
-    /* 确保长单词不会撑破布局 */
+    /* 确保长单词不会撑破布局 / Prevent long words from breaking layout */
 }
 
 h1 {
@@ -249,9 +249,9 @@ li {
     margin-bottom: 0.4em;
 }
 
-/* =========================================
-   F & G. 布局与头部
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   F & G. 布局与头部 / Layout & header
+   小节横幅（底） / ========================================= */
 .container {
     max-width: var(--content-width);
     margin: 0 auto;
@@ -326,9 +326,9 @@ header nav a[aria-current="page"] {
     border: 0;
 }
 
-/* =========================================
-   H. 主内容区域
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   H. 主内容区域 / Main content area
+   小节横幅（底） / ========================================= */
 main {
     flex-grow: 1;
     padding: var(--space-xl) 0 calc(var(--space-xl) * 2);
@@ -348,9 +348,9 @@ main {
     max-width: 100%;
 }
 
-/* =========================================
-   I. 目录 (TOC)
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   I. 目录 (TOC) / Table of contents (TOC)
+   小节横幅（底） / ========================================= */
 .toc-area {
     width: 200px;
     flex-shrink: 0;
@@ -450,7 +450,7 @@ main {
     max-width: 100%;
 }
 
-/* --- 移动端目录动画与交互优化 --- */
+/* --- 移动端目录动画与交互优化 / Mobile TOC animation & interaction --- */
 .mobile-toc {
     display: none;
     margin-bottom: var(--space-xl);
@@ -467,11 +467,11 @@ main {
 
 .mobile-toc summary {
     list-style: none;
-    /* 隐藏默认三角 */
+    /* 隐藏默认三角 / Hide default disclosure triangle */
     position: relative;
     padding: var(--space-sm) var(--space-md);
     padding-right: var(--space-xl);
-    /* 留出右侧图标位置 */
+    /* 留出右侧图标位置 / Reserve space for right-side icon */
     cursor: pointer;
     color: var(--color-main-subtext);
     outline: none;
@@ -479,12 +479,12 @@ main {
     font-weight: 500;
 }
 
-/* 隐藏 Webkit 默认三角 */
+/* 隐藏 Webkit 默认三角 / Hide WebKit default disclosure marker */
 .mobile-toc summary::-webkit-details-marker {
     display: none;
 }
 
-/* 自定义右侧动画图标 */
+/* 自定义右侧动画图标 / Custom animated icon on the right */
 .mobile-toc summary::after {
     content: "+";
     position: absolute;
@@ -507,7 +507,7 @@ main {
 
 .mobile-toc[open]>summary::after {
     transform: translateY(-50%) rotate(45deg);
-    /* 旋转动画 */
+    /* 旋转动画 / Rotate animation */
 }
 
 .mobile-toc-content {
@@ -532,9 +532,9 @@ main {
     text-decoration: none;
 }
 
-/* =========================================
-   J. 文章正文 (Content)
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   J. 文章正文 (Content) / Post content
+   小节横幅（底） / ========================================= */
 .post-content p {
     color: #212121;
     letter-spacing: 0.005em;
@@ -544,7 +544,7 @@ main {
     text-rendering: optimizeLegibility;
 }
 
-/* [优化] 限制最佳阅读宽度 (约68字符)，减少眼球扫视疲劳 */
+/* [优化] 限制最佳阅读宽度 (约68字符)，减少眼球扫视疲劳 / [Optimize] Cap reading width (~68ch) to reduce eye strain */
 .post-content p,
 .post-content ul,
 .post-content ol,
@@ -555,7 +555,7 @@ main {
     margin-right: auto;
 }
 
-/* 列表内边距调整适配宽度限制 */
+/* 列表内边距调整适配宽度限制 / List padding adjusted for width constraint */
 .post-content ul,
 .post-content ol {
     padding-left: 2rem;
@@ -592,7 +592,7 @@ main {
     }
 }
 
-/* [优化] 标题锚点提示 (Hover 显示 #) */
+/* [优化] 标题锚点提示 (Hover 显示 #) / [Optimize] Heading anchor hint (# on hover) */
 .post-content h2,
 .post-content h3 {
     position: relative;
@@ -625,7 +625,7 @@ main {
     }
 }
 
-/* 列表样式 */
+/* 列表样式 / List styles */
 .page-post .post-content ul ul,
 .page-post .post-content ol ol,
 .page-index .post-content ul ul,
@@ -677,7 +677,7 @@ main {
     transition: opacity 0.3s ease;
 }
 
-/* --- 图片说明 (Caption) 优化 --- */
+/* --- 图片说明 (Caption) 优化 / Image caption styling --- */
 .post-content img+em {
     display: flex;
     justify-content: center;
@@ -701,7 +701,7 @@ main {
     opacity: 0.6;
 }
 
-/* --- 引用块 (Blockquote) 视觉增强 --- */
+/* --- 引用块 (Blockquote) 视觉增强 / Blockquote visual enhancement --- */
 .post-content blockquote {
     position: relative;
     border-left: 3px solid var(--color-main-border);
@@ -736,7 +736,7 @@ main {
     }
 }
 
-/* [优化] 行内代码应用等宽字体 */
+/* [优化] 行内代码应用等宽字体 / [Optimize] Inline code uses monospace font */
 .post-content code:not(pre code) {
     font-family: var(--font-mono);
     color: var(--color-text);
@@ -798,7 +798,7 @@ main {
     }
 }
 
-/* --- [优化] 代码块 字体与抗锯齿优化 --- */
+/* --- [优化] 代码块 字体与抗锯齿优化 / [Optimize] Code block font & antialiasing --- */
 .post-content .highlight {
     position: relative;
     margin: var(--space-lg) 0;
@@ -896,7 +896,7 @@ main {
     content: attr(data-title);
 }
 
-/* 右上角显示语言，固定在外层容器，不随横向滚动移动 */
+/* 右上角显示语言，固定在外层容器，不随横向滚动移动 / Language label top-right, fixed on outer container (no horizontal scroll) */
 .post-content .highlight::after {
     content: none;
     position: absolute;
@@ -941,7 +941,7 @@ main {
     content: attr(data-lang);
 }
 
-/* 使用 :has() 根据 code class 显示具体语言 */
+/* 使用 :has() 根据 code class 显示具体语言 / Use :has() to show language from code class */
 .post-content .highlight:has(code[class*="python"])::after,
 .post-content .highlight:has(code[class*="language-python"])::after {
     content: "PYTHON";
@@ -1015,7 +1015,7 @@ main {
     }
 }
 
-/* --- 表格 UI/UX (表头冻结) --- */
+/* --- 表格 UI/UX (表头冻结) / Table UI/UX (sticky header) --- */
 .table-wrapper {
     width: 100%;
     overflow-x: auto;
@@ -1112,7 +1112,7 @@ main {
     font-size: 0.9rem;
     border-bottom: 1px solid var(--color-main-border);
 
-    /* 表头吸顶 (Sticky Header) */
+    /* 表头吸顶 (Sticky Header) / Sticky table header */
     position: sticky;
     top: 0;
     z-index: 10;
@@ -1278,9 +1278,9 @@ main {
     }
 }
 
-/* =========================================
-   K. 文章页头部元数据 (Post Meta)
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   K. 文章页头部元数据 (Post Meta) / Post page header metadata
+   小节横幅（底） / ========================================= */
 .page-header h1 {
     margin-top: 0;
     margin-bottom: 15px;
@@ -1391,9 +1391,9 @@ main {
     }
 }
 
-/* =========================================
-   N. 极简文章列表 (首页/标签页 - 交互增强)
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   N. 极简文章列表 (首页/标签页 - 交互增强) / Minimal post list (index/tags – enhanced interaction)
+   小节横幅（底） / ========================================= */
 .post-list {
     list-style: none;
     padding: 0;
@@ -1405,7 +1405,7 @@ main {
 .post-list-item {
     display: block;
     position: relative;
-    /* 确保层级 */
+    /* 确保层级 / Ensure stacking order */
     padding: var(--space-lg) var(--space-lg) var(--space-lg) calc(var(--space-lg) - 1px);
     border-bottom: 1px dashed var(--color-main-border);
     border-left: none;
@@ -1424,14 +1424,14 @@ main {
     text-decoration: none;
 }
 
-/* [新增] 使用伪元素模拟左侧高亮条，避免 border 交叉处的缺角 */
+/* [新增] 使用伪元素模拟左侧高亮条，避免 border 交叉处的缺角 / [New] Pseudo-element left highlight bar to avoid border corner gaps */
 .post-list-item::before {
     content: "";
     position: absolute;
     left: 0;
     top: 0;
     bottom: -1px;
-    /* 延伸到底部边框之下，填补缺角 */
+    /* 延伸到底部边框之下，填补缺角 / Extend below bottom border to fill gap */
     width: 4px;
     background-color: transparent;
     transition: background-color 0.2s;
@@ -1444,13 +1444,13 @@ main {
     outline: none;
 }
 
-/* [新增] 悬停时改变伪元素颜色 */
+/* [新增] 悬停时改变伪元素颜色 / [New] Change pseudo-element color on hover */
 .post-list-item:hover::before,
 .post-list-item:focus::before {
     background-color: var(--color-primary);
 }
 
-/* 文章列表卡片按压效果 */
+/* 文章列表卡片按压效果 / Post list card active (press) state */
 .post-list-item:active {
     background-color: rgba(0, 0, 0, 0.05);
 }
@@ -1553,7 +1553,7 @@ main {
         background-color: rgba(255, 255, 255, 0.03);
     }
 
-    /* [新增] 暗色模式下的伪元素颜色 */
+    /* [新增] 暗色模式下的伪元素颜色 / [New] Pseudo-element color in dark mode */
     .post-list-item:hover::before,
     .post-list-item:focus::before {
         background-color: var(--color-link-dark);
@@ -1578,9 +1578,9 @@ main {
 }
 
 
-/* =========================================
-   P. 特殊页面样式 (Archive & Tags)
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   P. 特殊页面样式 (Archive & Tags) / Special pages (archive & tags)
+   小节横幅（底） / ========================================= */
 .tag-cloud {
     display: flex;
     flex-wrap: wrap;
@@ -1643,7 +1643,7 @@ main {
     background-color: rgba(0, 0, 0, 0.02);
 }
 
-/* 标签云按压效果 */
+/* 标签云按压效果 / Tag cloud active (press) state */
 .tag-cloud-item:active {
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -1662,7 +1662,7 @@ main {
     }
 }
 
-/* --- Archive 归档页美化 (Timeline 风格) --- */
+/* --- Archive 归档页美化 (Timeline 风格) / Archive page styling (timeline) --- */
 .archive-page {
     max-width: 100%;
 }
@@ -1728,7 +1728,7 @@ main {
     background-color: rgba(0, 0, 0, 0.02);
 }
 
-/* 归档项按压效果 */
+/* 归档项按压效果 / Archive item active (press) state */
 .archive-item:active {
     background-color: rgba(0, 0, 0, 0.05);
 }
@@ -1902,10 +1902,10 @@ main {
     }
 }
 
-/* =========================================
-   L. 底部 (Footer)
-   ========================================= */
-/* 替换原有的 footer 样式 */
+/* 小节横幅（顶） / =========================================
+   L. 底部 (Footer) / Footer
+   小节横幅（底） / ========================================= */
+/* 替换原有的 footer 样式 / Replaces previous footer styles */
 footer {
     padding: 20px 0;
     margin-top: auto;
@@ -1985,9 +1985,9 @@ footer {
     }
 }
 
-/* =========================================
-   M. 按钮
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   M. 按钮 / Buttons
+   小节横幅（底） / ========================================= */
 .button {
     display: inline-block;
     padding: var(--space-sm) var(--space-md);
@@ -2021,9 +2021,9 @@ footer {
     font-size: 0.85rem;
 }
 
-/* =========================================
-   A11Y & Focus
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   无障碍与焦点 / A11Y & Focus
+   小节横幅（底） / ========================================= */
 .skip-link {
     position: absolute;
     left: -9999px;
@@ -2083,9 +2083,9 @@ summary:focus:not(:focus-visible) {
     box-shadow: inset var(--focus-ring-shadow);
 }
 
-/* =========================================
-   Z. 响应式布局
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   Z. 响应式布局 / Responsive layout
+   小节横幅（底） / ========================================= */
 @media (max-width: 900px) {
     .header-inner {
         align-items: baseline;
@@ -2311,9 +2311,9 @@ summary:focus:not(:focus-visible) {
     }
 }
 
-/* =========================================
-   Task List
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   任务列表 / Task list (checkbox styling)
+   小节横幅（底） / ========================================= */
 .task-list-item {
     list-style-type: none !important;
     position: relative;
@@ -2339,9 +2339,9 @@ summary:focus:not(:focus-visible) {
     color: var(--color-main-subtext);
 }
 
-/* =========================================
-   Q. 文章上/下导航 (交互优化)
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   Q. 文章上/下导航 (交互优化) / Post prev/next navigation (interaction)
+   小节横幅（底） / ========================================= */
 .post-navigation {
     display: flex;
     justify-content: space-between;
@@ -2440,9 +2440,9 @@ summary:focus:not(:focus-visible) {
     }
 }
 
-/* =========================================
-   R. 版权声明
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   R. 版权声明（许可提示） / R. Copyright notice and license
+   小节横幅（底） / ========================================= */
 .post-license {
     margin: var(--space-xl) 0 0;
     padding: var(--space-md) 0 0;
@@ -2533,9 +2533,9 @@ summary:focus:not(:focus-visible) {
         margin: 30px 0 0;
     }
 }
-/* =========================================
-   Z1. Pygments 代码高亮颜色
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   Z1. Pygments 代码高亮颜色 / Pygments syntax highlight colors
+   小节横幅（底） / ========================================= */
 .highlight {
     color: #24292f;
 }
@@ -2753,12 +2753,12 @@ summary:focus:not(:focus-visible) {
     }
 }
 
-/* =========================================
-   Z2. 打印样式 (Print Styles)
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   Z2. 打印样式 (Print Styles) / Print styles
+   小节横幅（底） / ========================================= */
 @media print {
 
-    /* 隐藏无关元素 */
+    /* 隐藏无关元素 / Hide non-essential elements */
     header,
     footer,
     .toc-area,
@@ -2768,7 +2768,7 @@ summary:focus:not(:focus-visible) {
         display: none !important;
     }
 
-    /* 重置容器宽度 */
+    /* 重置容器宽度 / Reset container width */
     .container,
     .main-layout,
     .content-area {
@@ -2779,7 +2779,7 @@ summary:focus:not(:focus-visible) {
         display: block !important;
     }
 
-    /* 优化文字颜色为纯黑，节省墨水 */
+    /* 优化文字颜色为纯黑，节省墨水 / Pure black text to save ink */
     body,
     h1,
     h2,
@@ -2790,27 +2790,27 @@ summary:focus:not(:focus-visible) {
         background: #fff !important;
     }
 
-    /* 代码块优化 */
+    /* 代码块优化 / Code block print optimization */
     .post-content pre {
         border: 1px solid #ccc;
         white-space: pre-wrap;
         page-break-inside: avoid;
         padding-top: 15px;
-        /* 打印时移除 MacOS 红绿灯上方的额外空间 */
+        /* 打印时移除 MacOS 红绿灯上方的额外空间 / Remove extra space above macOS traffic lights when printing */
         font-family: var(--font-mono) !important;
     }
 
     .post-content pre::before {
         display: none;
-        /* 打印时不显示红绿灯 */
+        /* 打印时不显示红绿灯 / Hide traffic-light dots when printing */
     }
 
     .post-content pre::after {
         display: none;
-        /* 打印时不显示语言标签 */
+        /* 打印时不显示语言标签 / Hide language label when printing */
     }
 
-    /* 链接显示 URL */
+    /* 链接显示 URL / Show link URL after anchor text */
     .post-content a::after {
         content: " (" attr(href) ")";
         font-size: 0.8em;
@@ -2823,37 +2823,37 @@ summary:focus:not(:focus-visible) {
     }
 }
 
-/* =========================================
-   Z3. 404 Error Page Styles (Added)
-   ========================================= */
+/* 小节横幅（顶） / =========================================
+   Z3. 404 错误页样式（新增） / Z3. 404 error page styles (added)
+   小节横幅（底） / ========================================= */
 
-/* 针对 404 页面布局的特殊处理 */
+/* 针对 404 页面布局的特殊处理 / Layout overrides for the 404 page */
 .page-404 .content-area {
-    /* 让内容区域在视觉上居中，但保留页眉页脚 */
+    /* 让内容区域在视觉上居中，但保留页眉页脚 / Center content visually while keeping header/footer */
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 50vh;
-    /* 确保有足够的高度来居中 */
+    /* 确保有足够的高度来居中 / Ensure enough height for vertical centering */
 }
 
 .page-404 .post-content {
-    /* 移除默认的文章边距，使其完全居中 */
+    /* 移除默认的文章边距，使其完全居中 / Remove default post margins for full centering */
     width: 100%;
     max-width: 100%;
 }
 
-/* 404 容器 */
+/* 404 容器 / 404 container */
 .error-container {
     text-align: center;
     padding: var(--space-xl) var(--space-lg);
     animation: fadeIn 0.8s ease-out;
 }
 
-/* 巨大的数字 404 */
+/* 巨大的数字 404 / Large 404 numeral */
 .error-code {
     font-family: var(--font-mono);
-    /* 使用您网站的代码字体 */
+    /* 使用您网站的代码字体 / Site monospace font */
     font-size: 8rem;
     font-weight: 700;
     line-height: 1;
@@ -2862,11 +2862,11 @@ summary:focus:not(:focus-visible) {
     position: relative;
     display: inline-block;
 
-    /* 纯 CSS 阴影效果 */
+    /* 纯 CSS 阴影效果 / Pure CSS text-shadow effect */
     text-shadow: 4px 4px 0px rgba(0, 121, 107, 0.15);
 }
 
-/* 装饰性分割线 */
+/* 装饰性分割线 / Decorative divider */
 .error-divider {
     width: 64px;
     height: 4px;
@@ -2875,7 +2875,7 @@ summary:focus:not(:focus-visible) {
     border-radius: var(--radius-pill);
 }
 
-/* 错误主标题 */
+/* 错误主标题 / Error heading */
 .error-message {
     font-size: 1.8rem;
     font-weight: 700;
@@ -2884,7 +2884,7 @@ summary:focus:not(:focus-visible) {
     letter-spacing: -0.02em;
 }
 
-/* 错误描述文本 */
+/* 错误描述文本 / Error description */
 .error-desc {
     font-size: 1.1rem;
     color: var(--color-main-subtext);
@@ -2892,7 +2892,7 @@ summary:focus:not(:focus-visible) {
     line-height: 1.6;
 }
 
-/* 按钮样式微调 (复用现有的 .button) */
+/* 按钮样式微调 (复用现有的 .button) / Button tweaks (reuses .button) */
 .error-container .button {
     padding: var(--space-md) var(--space-xl);
     font-size: 1rem;
@@ -2912,7 +2912,7 @@ summary:focus:not(:focus-visible) {
     background-color: #004d40;
 }
 
-/* 简单的淡入动画 */
+/* 简单的淡入动画 / Simple fade-in animation */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -2923,7 +2923,7 @@ summary:focus:not(:focus-visible) {
     }
 }
 
-/* --- 暗色模式适配 --- */
+/* --- 暗色模式适配 / Dark mode overrides --- */
 @media (prefers-color-scheme: dark) {
     .error-code {
         color: var(--color-link-dark);
@@ -2942,7 +2942,7 @@ summary:focus:not(:focus-visible) {
     }
 }
 
-/* 移动端适配 */
+/* 移动端适配 / Mobile layout */
 @media (max-width: 600px) {
     .error-code {
         font-size: 5rem;
@@ -2973,14 +2973,14 @@ summary:focus:not(:focus-visible) {
     line-height: 1.5;
 }
 
-/* 确保语法高亮部分也使用等宽字体 */
+/* 确保语法高亮部分也使用等宽字体 / Ensure syntax highlight uses monospace */
 .highlight pre,
 .highlight code {
     font-family: var(--font-mono) !important;
     font-size: inherit;
 }
 
-/* 暗色模式下同样设置 */
+/* 暗色模式下同样设置 / Same settings in dark mode */
 @media (prefers-color-scheme: dark) {
 
     .highlight pre,
@@ -3017,4 +3017,4 @@ html {
         transition-duration: 0.01ms !important;
     }
 }
-/* --- END OF FILE style.css --- */
+/* --- END OF FILE style.css --- / 文件结尾 */

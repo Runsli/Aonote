@@ -3,8 +3,11 @@
   publish = "_site"
 
 # 静态博客：未命中路径由 Netlify 自动回退到根目录的 404.html (HTTP 404)
+# Static blog: Netlify serves root 404.html with HTTP 404 for unknown paths.
 # 不要使用 SPA 风格的 /* -> /index.html (status=200)，那会让 404.html 永远不生效，
+# Do not use SPA-style /* -> /index.html (200); that bypasses 404.html entirely.
 # 并使搜索引擎把所有错误路径当成"软 404"的首页副本，伤 SEO。
+# Search engines would treat every bad URL as a duplicate homepage (soft 404), hurting SEO.
 
 [[headers]]
   for = "/*"

@@ -1,4 +1,4 @@
-# generator.py
+# generator.py / HTML 页面与 Feed 生成器
 
 import os
 import shutil 
@@ -15,7 +15,7 @@ from i18n import get_translations
 from parser import tag_to_slug 
 from bs4 import BeautifulSoup 
 
-# --- Jinja2 环境配置配置 ---
+# --- Jinja2 环境配置 / Jinja2 environment setup ---
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
 env = Environment(
     loader=FileSystemLoader(TEMPLATE_DIR),
@@ -31,7 +31,8 @@ RAW_HTML_BLOCK_RE = re.compile(
 
 
 def minify_html_content(html_content: str) -> str:
-    """压缩生成的 HTML，同时保留代码块等原始空白敏感区域。"""
+    """压缩生成的 HTML，同时保留代码块等原始空白敏感区域。
+    Minify generated HTML while preserving whitespace-sensitive blocks."""
     if not getattr(config, 'HTML_MINIFY', True):
         return html_content
 
@@ -72,7 +73,8 @@ def render_template(template, context: Dict[str, Any]) -> str:
 
 
 def get_copyright_notice(title, author, url, license_config=None):
-    """根据当前界面语言生成版权声明文本。"""
+    """根据当前界面语言生成版权声明文本。
+    Build the copyright notice for the active UI language."""
     if license_config is None:
         license_config = config.COPYRIGHT_LICENSE
 
@@ -86,6 +88,7 @@ def get_copyright_notice(title, author, url, license_config=None):
 
     if not text:
         # 兼容用户仍在 config.py 的 allowed_types 中手动覆盖 text 的情况。
+        # Fallback when config.py still overrides license text manually in allowed_types.
         license_info = license_config.get('allowed_types', {}).get(license_type, {})
         text = license_info.get('text', '')
 
@@ -93,7 +96,8 @@ def get_copyright_notice(title, author, url, license_config=None):
 
 
 def get_copyright_format(title, author, url, license_config=None):
-    """生成当前界面语言下的标准引用格式。"""
+    """生成当前界面语言下的标准引用格式。
+    Build the standard citation format for the active UI language."""
     if license_config is None:
         license_config = config.COPYRIGHT_LICENSE
 
@@ -108,10 +112,11 @@ def get_copyright_additional_note(license_config=None) -> str:
     return license_config.get('additional_note') or get_i18n().get('copyright_additional_note', '')
 
 
-# --- 辅助函数：路径和 URL (核心路径修正) ---
+# --- 辅助函数：路径和 URL / Path and URL helpers ---
 
 def get_site_root_prefix() -> str:
-    """获取网站在部署环境中的相对子目录路径前缀。"""
+    """获取网站在部署环境中的相对子目录路径前缀。
+    Return the deployment subpath prefix used for internal links."""
     root = config.REPO_SUBPATH.strip()
     if not root or root == '/':
         config.SITE_ROOT = '' 
@@ -121,14 +126,15 @@ def get_site_root_prefix() -> str:
     return config.SITE_ROOT
 
 def make_internal_url(path: str) -> str:
-    """生成规范化的内部 URL (Pretty URL: /slug/)。"""
+    """生成规范化的内部 URL (Pretty URL: /slug/)。
+    Build a normalized internal URL with pretty permalink style."""
     if not path:
         return ""
         
     normalized_path = path if path.startswith('/') else f'/{path}'
     site_root = get_site_root_prefix()
     
-    # 移除 .html 后缀，除非是特殊文件
+    # 移除 .html 后缀，除非是特殊文件 / Strip .html except special files
     if normalized_path.lower().endswith('.html') and \
        not normalized_path.lower().endswith(config.RSS_FILE) and \
        not normalized_path.lower().endswith(config.ATOM_FILE) and \
@@ -139,7 +145,7 @@ def make_internal_url(path: str) -> str:
     if normalized_path.lower() == '/index': 
         normalized_path = '/'
     elif normalized_path.lower() == '/404' or normalized_path.lower() == '/404.html':
-        # 404 页面通常不需要 url 后缀，或者保持原样
+        # 404 页面通常不需要 url 后缀，或者保持原样 / Keep 404 path as-is
         pass 
     elif normalized_path.lower().endswith(config.RSS_FILE):
         pass
@@ -159,13 +165,15 @@ def make_internal_url(path: str) -> str:
     return f"{site_root}{normalized_path}"
 
 def is_post_hidden(post: Dict[str, Any]) -> bool:
-    """检查文章是否应被隐藏。"""
+    """检查文章是否应被隐藏。
+    Return True when a post should be hidden from public lists."""
     return post.get('status', 'published').lower() == 'draft' or post.get('hidden') is True
 
-# --- 数据清洗函数 ---
+# --- 数据清洗函数 / Post data normalization ---
 
 def process_posts_for_template(posts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """深度清洗文章列表链接。"""
+    """深度清洗文章列表链接。
+    Normalize internal links inside post list data."""
     cleaned_posts = []
     for post in posts:
         new_post = post.copy()
@@ -190,12 +198,15 @@ def process_posts_for_template(posts: List[Dict[str, Any]]) -> List[Dict[str, An
         cleaned_posts.append(new_post)
     return cleaned_posts
 
-# --- 核心生成函数 ---
+# --- 核心生成函数 / Core page generators ---
 
 def _static_asset_exists(relative_name: str) -> bool:
     """检查源 static 目录下的资源文件是否真实存在。
 
     避免 JSON-LD 输出指向 404 的图片 URL（Google Rich Results 会因此降权）。
+
+    Check whether a static asset exists before emitting structured-data image URLs.
+    Avoid pointing rich-result metadata at missing images.
     """
     candidate = os.path.join(os.path.dirname(__file__), config.STATIC_DIR, relative_name)
     return os.path.isfile(candidate)
@@ -206,6 +217,9 @@ def _site_relative_asset_exists(url_path: str) -> bool:
 
     JSON-LD 输出前用它过滤掉 Markdown 中纯演示性质的 404 图片引用，
     防止结构化数据校验失败或被搜索引擎降权。
+
+    Check whether a site-root-relative asset exists in the build output before JSON-LD.
+    Filters demo-only broken image URLs so structured data validation does not fail.
     """
     rel = url_path.lstrip('/')
     if not rel:
@@ -223,6 +237,9 @@ def get_json_ld_schema(post: Dict[str, Any]) -> str:
 
     image / publisher.logo 仅在对应静态资源存在时输出，缺失时整字段省略，
     防止结构化数据指向不存在的 URL。
+
+    Build Article JSON-LD. Omit image and publisher.logo when assets are missing
+    so structured data never points at broken URLs.
     """
     base_url = config.BASE_URL.rstrip('/')
     site_root = get_site_root_prefix()
@@ -275,7 +292,8 @@ def get_json_ld_schema(post: Dict[str, Any]) -> str:
     return json.dumps(schema, ensure_ascii=False, indent=4)
 
 def generate_index_html(sorted_posts: List[Dict[str, Any]], build_time_info: str):
-    """生成首页"""
+    """生成首页
+    Generate the homepage (index.html)."""
     try:
         i18n = get_i18n()
         output_path = os.path.join(config.BUILD_DIR, 'index.html')
@@ -307,7 +325,8 @@ def generate_index_html(sorted_posts: List[Dict[str, Any]], build_time_info: str
 
 
 def generate_archive_html(sorted_posts: List[Dict[str, Any]], build_time_info: str):
-    """生成归档页 (archive/index.html)"""
+    """生成归档页 (archive/index.html)
+    Generate the archive page."""
     try:
         i18n = get_i18n()
         output_dir = os.path.join(config.BUILD_DIR, 'archive')
@@ -372,7 +391,8 @@ def generate_archive_html(sorted_posts: List[Dict[str, Any]], build_time_info: s
 
 
 def generate_tags_list_html(tag_map: Dict[str, List[Dict[str, Any]]], build_time_info: str):
-    """生成标签列表页"""
+    """生成标签列表页
+    Generate the tag cloud listing page."""
     try:
         i18n = get_i18n()
         output_dir = os.path.join(config.BUILD_DIR, 'tags')
@@ -417,7 +437,8 @@ def generate_tags_list_html(tag_map: Dict[str, List[Dict[str, Any]]], build_time
 
 
 def generate_feed_html(sorted_posts: List[Dict[str, Any]], build_time_info: str):
-    """生成 RSS 订阅说明页 (feed/index.html)"""
+    """生成 RSS 订阅说明页 (feed/index.html)
+    Generate the human-readable feed discovery page."""
     try:
         i18n = get_i18n()
         output_dir = os.path.join(config.BUILD_DIR, 'feed')
@@ -487,7 +508,8 @@ def generate_feed_html(sorted_posts: List[Dict[str, Any]], build_time_info: str)
 
 
 def generate_tag_page(tag_name: str, sorted_tag_posts: List[Dict[str, Any]], build_time_info: str):
-    """生成单个标签页面"""
+    """生成单个标签页面
+    Generate a single tag detail page."""
     try:
         i18n = get_i18n()
         tag_slug = tag_to_slug(tag_name)
@@ -522,7 +544,8 @@ def generate_tag_page(tag_name: str, sorted_tag_posts: List[Dict[str, Any]], bui
         print(f"Error tag page {tag_name}: {e}")
 
 def generate_robots_txt():
-    """生成 robots.txt"""
+    """生成 robots.txt
+    Generate robots.txt."""
     try:
         output_path = os.path.join(config.BUILD_DIR, 'robots.txt')
         content = f"User-agent: *\nAllow: /\nSitemap: {config.BASE_URL.rstrip('/')}{make_internal_url(config.SITEMAP_FILE)}\n"
@@ -533,7 +556,8 @@ def generate_robots_txt():
         print(f"Error robots.txt: {e}")
 
 def generate_sitemap(parsed_posts: List[Dict[str, Any]]) -> str:
-    """生成 sitemap.xml"""
+    """生成 sitemap.xml
+    Generate sitemap.xml content."""
     urls = []
     base_url = config.BASE_URL.rstrip('/')
     
@@ -575,7 +599,8 @@ def _feed_posts(parsed_posts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
 
 def generate_rss(parsed_posts: List[Dict[str, Any]]) -> str:
-    """生成 RSS Feed"""
+    """生成 RSS Feed
+    Generate RSS 2.0 feed XML."""
     items = []
     base_url = config.BASE_URL.rstrip('/')
     visible_posts = _feed_posts(parsed_posts)
@@ -606,7 +631,8 @@ def generate_rss(parsed_posts: List[Dict[str, Any]]) -> str:
 
 
 def generate_atom(parsed_posts: List[Dict[str, Any]]) -> str:
-    """生成 Atom Feed。"""
+    """生成 Atom Feed。
+    Generate Atom feed XML."""
     entries = []
     base_url = config.BASE_URL.rstrip('/')
     site_url = f"{base_url}{make_internal_url('/')}"
@@ -637,19 +663,20 @@ def generate_atom(parsed_posts: List[Dict[str, Any]]) -> str:
     return f'<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="{get_i18n().get("html_lang", "zh-cn")}"><title>{html.escape(config.BLOG_TITLE)}</title><subtitle>{html.escape(config.BLOG_DESCRIPTION)}</subtitle><link href="{site_url}" rel="alternate" type="text/html" /><link href="{atom_url}" rel="self" type="application/atom+xml" /><link href="{rss_url}" rel="alternate" type="application/rss+xml" /><id>{site_url}</id><updated>{updated_at}</updated><author><name>{html.escape(config.BLOG_AUTHOR)}</name></author>{"".join(entries)}</feed>'
 
 def generate_page_html(content_html: str, page_title: str, page_id: str, canonical_path_with_html: str, build_time_info: str):
-    """生成通用页面 (已修复：404页面生成在根目录)"""
+    """生成通用页面 (已修复：404页面生成在根目录)
+    Generate generic pages (404 is written to site root as 404.html)."""
     try:
-        # --- 修复开始：针对 404 页面的特殊路径处理 ---
+        # --- 修复开始：针对 404 页面的特殊路径处理 / 404 output path fix ---
         if page_id == '404':
-            # 404 页面必须生成在根目录，文件名为 404.html
+            # 404 页面必须生成在根目录，文件名为 404.html / 404 must live at _site/404.html
             output_dir = config.BUILD_DIR
             output_path = os.path.join(output_dir, '404.html')
         else:
-            # 其他页面（如 about）生成在子目录，如 /about/index.html
+            # 其他页面（如 about）生成在子目录，如 /about/index.html / Other pages use /slug/index.html
             output_dir = os.path.join(config.BUILD_DIR, page_id)
             os.makedirs(output_dir, exist_ok=True)
             output_path = os.path.join(output_dir, 'index.html')
-        # --- 修复结束 ---
+        # --- 修复结束 / End 404 path fix ---
         
         template = env.get_template('base.html')
         canonical_path = make_internal_url(canonical_path_with_html) 
@@ -679,11 +706,12 @@ def generate_page_html(content_html: str, page_title: str, page_id: str, canonic
         print(f"Error {page_id}: {e}")
 
 def generate_post_page(post: Dict[str, Any]):
-    """生成单篇文章页面"""
+    """生成单篇文章页面
+    Generate a single post detail page."""
     try:
         relative_link = post.get('link')
         if not relative_link: return
-        # 404 页面不通过此函数生成
+        # 404 页面不通过此函数生成 / 404 is generated elsewhere
         if relative_link.lower() == '404.html': return
 
         clean_name = relative_link[:-5] if relative_link.lower().endswith('.html') else relative_link
@@ -717,7 +745,7 @@ def generate_post_page(post: Dict[str, Any]):
             'footer_time_info': post.get('footer_time_info', ''),
             'footer_content_type': config.FOOTER_CONTENT_TYPE,
             'footer_custom_text': config.FOOTER_CUSTOM_TEXT,
-            # 版权相关
+            # 版权相关 / Copyright helpers
             'copyright_notice': get_copyright_notice,
             'copyright_format': get_copyright_format,
             'copyright_additional_note': get_copyright_additional_note(config.COPYRIGHT_LICENSE),
