@@ -188,7 +188,7 @@ python autobuild.py
 - 界面语言：`SITE_LANGUAGE`，固定 UI 文案来自 `i18n.py`，当前内置 `zh-CN` 和 `en`。
 - 路径配置：`REPO_SUBPATH`、`BUILD_DIR`、`MARKDOWN_DIR`。
 - Markdown 扩展：`MARKDOWN_EXTENSIONS`、`MARKDOWN_EXTENSION_CONFIGS`。
-- 版权信息：`COPYRIGHT_LICENSE`。
+- 版权信息：`COPYRIGHT_LICENSE` 控制开关、类型和图标；默认版权文案来自 `i18n.py`。
 
 ## 部署
 

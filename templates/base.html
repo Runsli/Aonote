@@ -219,8 +219,8 @@
     </p>
     
     {# 只有当 show_standard_format 为 True 时才显示 additional_note #}
-    {% if copyright_config.additional_note and copyright_config.show_standard_format %}
-    <p>{{ copyright_config.additional_note }}</p>
+    {% if copyright_additional_note and copyright_config.show_standard_format %}
+    <p>{{ copyright_additional_note }}</p>
     {% endif %}
     
     {% if copyright_config.show_standard_format %}

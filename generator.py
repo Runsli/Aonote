@@ -57,7 +57,7 @@ def write_html_file(output_path: str, html_content: str) -> None:
         f.write(minify_html_content(html_content))
 
 
-def get_i18n() -> Dict[str, str]:
+def get_i18n() -> Dict[str, Any]:
     return get_translations(getattr(config, 'SITE_LANGUAGE', 'zh-CN'))
 
 
@@ -69,6 +69,43 @@ def render_template(template, context: Dict[str, Any]) -> str:
         **context,
     }
     return template.render(template_context)
+
+
+def get_copyright_notice(title, author, url, license_config=None):
+    """根据当前界面语言生成版权声明文本。"""
+    if license_config is None:
+        license_config = config.COPYRIGHT_LICENSE
+
+    license_type = license_config.get('type', 'CC_BY_NC_4.0')
+    if license_type == 'CUSTOM':
+        return license_config.get('custom_text', '')
+
+    i18n = get_i18n()
+    notices = i18n.get('copyright_license_notices', {})
+    text = notices.get(license_type) or notices.get('CC_BY_NC_4.0', '')
+
+    if not text:
+        # 兼容用户仍在 config.py 的 allowed_types 中手动覆盖 text 的情况。
+        license_info = license_config.get('allowed_types', {}).get(license_type, {})
+        text = license_info.get('text', '')
+
+    return text.replace('{url}', url).replace('{title}', title).replace('{author}', author)
+
+
+def get_copyright_format(title, author, url, license_config=None):
+    """生成当前界面语言下的标准引用格式。"""
+    if license_config is None:
+        license_config = config.COPYRIGHT_LICENSE
+
+    template_str = license_config.get('format_template') or get_i18n().get('copyright_format_template', '')
+    return template_str.format(title=title, author=author, url=url)
+
+
+def get_copyright_additional_note(license_config=None) -> str:
+    if license_config is None:
+        license_config = config.COPYRIGHT_LICENSE
+
+    return license_config.get('additional_note') or get_i18n().get('copyright_additional_note', '')
 
 
 # --- 辅助函数：路径和 URL (核心路径修正) ---
@@ -572,44 +609,6 @@ def generate_page_html(content_html: str, page_title: str, page_id: str, canonic
     except Exception as e:
         print(f"Error {page_id}: {e}")
 
-# 在 generator.py 中添加以下函数
-
-def get_copyright_notice(title, author, url, license_config=None):
-    """根据配置生成版权申明文本"""
-    if license_config is None:
-        license_config = {
-            'type': 'CC_BY_NC_4.0',
-            'custom_text': '',
-            'additional_note': '转载请遵循协议，务必保留作者署名及原文链接。'
-        }
-    
-    if license_config.get('type') == 'CC_BY_NC_4.0':
-        return f"本文依据 <a href='https://creativecommons.org/licenses/by-nc/4.0/' target='_blank' rel='license noopener noreferrer'>CC BY-NC 4.0 许可协议</a> 发布。"
-    elif license_config.get('type') == 'CC_BY_SA_4.0':
-        return f"本文依据 <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank' rel='license noopener noreferrer'>CC BY-SA 4.0 许可协议</a> 发布。"
-    elif license_config.get('type') == 'MIT':
-        return f"本文采用 MIT 许可证发布。"
-    elif license_config.get('type') == 'CUSTOM':
-        return license_config.get('custom_text', '')
-    else:
-        return f"本文依据 <a href='https://creativecommons.org/licenses/by-nc/4.0/' target='_blank' rel='license noopener noreferrer'>CC BY-NC 4.0 许可协议</a> 发布。"
-
-def get_copyright_format(title, author, url, license_config=None):
-    """生成标准引用格式"""
-    if license_config is None:
-        license_config = {
-            'format_template': '''本文标题：{title}
-作者：{author}
-原文链接：<a href="{url}">{url}</a>'''
-        }
-    
-    template = license_config.get('format_template', '''本文标题：{title}
-作者：{author}
-原文链接：<a href="{url}">{url}</a>''')
-    
-    return template.format(title=title, author=author, url=url)
-
-# 在 generator.py 中替换整个 generate_post_page 函数
 def generate_post_page(post: Dict[str, Any]):
     """生成单篇文章页面"""
     try:
@@ -627,35 +626,6 @@ def generate_post_page(post: Dict[str, Any]):
         template = env.get_template('base.html')
         processed_list = process_posts_for_template([post])
         current_post_processed = processed_list[0]
-
-        # 版权相关函数
-        def get_copyright_notice(title, author, url):
-            license_config = config.COPYRIGHT_LICENSE
-            if not license_config.get('enable', False):
-                return ""
-            
-            license_type = license_config.get('type', 'CC_BY_NC_4.0')
-            if license_type == 'CUSTOM':
-                return license_config.get('custom_text', '')
-            elif license_type in license_config.get('allowed_types', {}):
-                license_info = license_config['allowed_types'][license_type]
-                # 替换模板中的占位符
-                text = license_info['text']
-                text = text.replace('{url}', url).replace('{title}', title).replace('{author}', author)
-                return text
-            else:
-                # 默认返回 CC BY-NC 4.0
-                default_license = license_config['allowed_types'].get('CC_BY_NC_4.0', {})
-                text = default_license.get('text', '本文依据 <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="license noopener noreferrer">CC BY-NC 4.0 许可协议</a> 发布。')
-                text = text.replace('{url}', url).replace('{title}', title).replace('{author}', author)
-                return text
-
-        def get_copyright_format(title, author, url):
-            license_config = config.COPYRIGHT_LICENSE
-            template_str = license_config.get('format_template', '''本文标题：{title}
-作者：{author}
-原文链接：<a href="{url}">{url}</a>''')
-            return template_str.format(title=title, author=author, url=url)
 
         context = {
             'page_id': 'post',
@@ -681,6 +651,7 @@ def generate_post_page(post: Dict[str, Any]):
             # 版权相关
             'copyright_notice': get_copyright_notice,
             'copyright_format': get_copyright_format,
+            'copyright_additional_note': get_copyright_additional_note(config.COPYRIGHT_LICENSE),
             'copyright_config': config.COPYRIGHT_LICENSE,
         }
 
