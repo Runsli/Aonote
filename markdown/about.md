@@ -1,32 +1,50 @@
 ---
 title: 关于 Aonote 青笺
 date: 2025-12-01
-summary: 关于 Aonote 青笺的站点理念、技术栈和内容方向。
+summary: 介绍 Aonote 青笺作为 no-JS 静态博客模板的设计原则、功能边界和自定义方式。
 hidden: true  # 增加一个自定义字段，用于标记该文件不应被常规博客流程处理
 ---
 
-# 👋 这里是 Aonote 青笺
+# 关于 Aonote 青笺
 
-我是一名专注于 **数据科学** 和 **纯粹 Web 技术** 的开发者。
+Aonote 青笺是一个用 Python 编写的 no-JS 静态博客模板。它关注的是内容站最基础也最重要的部分：稳定的页面结构、清晰的阅读体验、可维护的 Markdown 内容，以及可以直接部署的静态产物。
 
-## 💡 网站理念
+## 设计原则
 
-这个网站是我实践**极简主义**和**高性能** Web 技术的试验场。
+这个模板围绕几个原则构建：
 
-* **轻量级：** 不依赖任何现代前端框架（如 React/Vue）。所有页面由 Python 脚本（`autobuild.py`）生成纯静态 HTML。
-* **优雅：** 追求内容的可读性，通过 CSS 实现了简洁美观的暗色模式和卡片化设计。
-* **专注：** 博客内容主要围绕数据分析、Python 编程、Web 开发心得，以及对极简生活方式的思考。
+- **内容优先**：页面布局尽量减少干扰，让标题、正文、代码块、表格和脚注保持清楚的阅读层级。
+- **纯静态输出**：构建结果是 HTML、CSS 和静态资源，不需要浏览器端 JavaScript 才能阅读主要内容。
+- **长期可维护**：文章使用 Markdown 管理，模板、样式、配置和构建逻辑各自独立，方便逐步调整。
+- **默认可检查**：构建后自动检查站内链接、基础 SEO、RSS/Atom、无障碍细节和 no-JS 约束。
+- **容易部署**：输出目录 `_site/` 可以直接发布到常见静态托管平台。
 
-## 🛠️ 我的技术栈
+## 内置能力
 
-* **数据科学:** Python, Pandas, NumPy, Scikit-learn, Matplotlib, SQL
-* **Web 技术:** HTML5, CSS3, Vanilla JavaScript, **纯静态生成**
-* **自动化:** Python Scripting, GitHub Actions
+Aonote 青笺默认提供：
 
-## 🤝 联系我
+- 首页、文章、归档、标签、关于页和 404 页面生成。
+- RSS、Atom、Sitemap、robots.txt 和常见分享元信息。
+- Markdown 扩展支持，包括代码高亮、目录、表格、脚注、任务列表、提示块、删除线、Emoji 和数学公式。
+- 浅色/暗色模式、移动端导航、可见键盘焦点和响应式阅读布局。
+- 表格、代码块、任务列表、脚注和 diff 代码块的无障碍增强。
 
-欢迎通过以下方式与我交流：
+## 适合的使用方式
 
-* **Email:** [username@example.com](mailto:username@example.com)
+你可以把它作为：
 
----
+- 个人博客模板。
+- 技术笔记或知识库模板。
+- 项目主页或轻量文档站模板。
+- no-JS 静态站实践样板。
+
+如果你正在把它改成自己的站点，建议优先更新 `config.py`、`README.md`、`markdown/about.md` 和首页欢迎文章，再根据内容气质调整配色和排版。
+
+## 自定义建议
+
+- 修改 `BLOG_TITLE`、`BLOG_DESCRIPTION`、`BLOG_AUTHOR` 和 `BASE_URL`。
+- 替换示例文章，保留需要的 Markdown 语法示例。
+- 根据自己的域名和部署平台检查 `vercel.json` 或 `netlify.toml`。
+- 构建前后运行 `python autobuild.py` 和 `python check_site.py`，确认链接、订阅源和无障碍检查都通过。
+
+Aonote 青笺只是一个起点。真正重要的是你放进来的内容，以及它能否在几年后仍然容易阅读、容易迁移、容易维护。
