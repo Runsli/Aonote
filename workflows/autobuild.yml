@@ -1,6 +1,6 @@
 # .github/workflows/autobuild.yml
 
-name: Build Blog and Deploy
+name: Build Aonote and Deploy
 
 # 定义触发条件
 on:

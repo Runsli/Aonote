@@ -160,7 +160,7 @@ python3 autobuild.py
 ```html
 <article class="post-list-item">
   <h2 class="post-title">
-    <a href="/posts/04/" class="post-title-link">文章标题</a>
+    <a href="/posts/blog-ui-ux-refactor/" class="post-title-link">文章标题</a>
   </h2>
   ...
 </article>
@@ -232,7 +232,7 @@ style-src 'self'
 
 ### 修复示例坏图
 
-首先修复了示例文章里的坏图。`markdown/02.md` 原本会实际渲染：
+首先修复了示例文章里的坏图。`markdown/markdown-basics.md` 原本会实际渲染：
 
 ```md
 ![Logo](/logo.png)

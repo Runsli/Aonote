@@ -1,11 +1,11 @@
 ---
-title: 关于 PureMo-Blog
+title: 关于 Aonote 青笺
 date: 2025-12-01
-summary: 关于作者 PureMo-Blog 的个人介绍、技术栈、和网站理念。
+summary: 关于 Aonote 青笺的站点理念、技术栈和内容方向。
 hidden: true  # 增加一个自定义字段，用于标记该文件不应被常规博客流程处理
 ---
 
-# 👋 大家好，我是 PureMo-Blog
+# 👋 这里是 Aonote 青笺
 
 我是一名专注于 **数据科学** 和 **纯粹 Web 技术** 的开发者。
 

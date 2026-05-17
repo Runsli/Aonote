@@ -76,7 +76,7 @@ tags: [basic, markdown]
 
 [根目录访问主页](/)
 
-[站内文章示例](/posts/01/)
+[站内文章示例](/posts/welcome-to-aonote/)
 
 [根目录访问关于](/about)
 
@@ -84,7 +84,7 @@ tags: [basic, markdown]
 
 ```md
 [根目录访问主页](/)
-[站内文章示例](/posts/01/)
+[站内文章示例](/posts/welcome-to-aonote/)
 [根目录访问关于](/about)
 [归档页面](/archive/)
 ```
@@ -210,12 +210,12 @@ RSS
 
 > 简洁并不意味着缺少结构，而是每个结构都有清晰的用途。
 >
-> <cite>PureMo-Blog 阅读样式测试</cite>
+> <cite>Aonote 阅读样式测试</cite>
 
 ```md
 > 简洁并不意味着缺少结构，而是每个结构都有清晰的用途。
 >
-> <cite>PureMo-Blog 阅读样式测试</cite>
+> <cite>Aonote 阅读样式测试</cite>
 ```
 
 ## 脚注

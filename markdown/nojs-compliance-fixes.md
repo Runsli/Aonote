@@ -35,14 +35,14 @@ tags: [nojs, 建站日志]
 之前生成器会默认写入：
 
 ```json
-"image": "https://PureMo-Blog.vercel.app/static/default-cover.png"
+"image": "https://aonote.vercel.app/static/default-cover.png"
 ```
 
 以及发布者 logo：
 
 ```json
 "logo": {
-  "url": "https://PureMo-Blog.vercel.app/static/logo.png"
+  "url": "https://aonote.vercel.app/static/logo.png"
 }
 ```
 
@@ -59,7 +59,7 @@ tags: [nojs, 建站日志]
 
 ### 阶段构建结果
 
-修复后重新构建站点，`_site/posts/01/index.html` 与 `_site/posts/02/index.html` 中的 JSON-LD 都不再包含不存在的 `image` 或 `logo` 字段。
+修复后重新构建站点，`_site/posts/welcome-to-aonote/index.html` 与 `_site/posts/markdown-basics/index.html` 中的 JSON-LD 都不再包含不存在的 `image` 或 `logo` 字段。
 
 ## P1：改善无障碍、图片加载与结构化数据
 
@@ -106,7 +106,7 @@ Markdown 文章里的图片之前只会自动补 `loading="lazy"`。这次继续
 
 ```html
 <article itemscope itemtype="https://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://PureMo-Blog.vercel.app/posts/03/">
+  <link itemprop="mainEntityOfPage" href="https://aonote.vercel.app/posts/nojs-compliance-fixes/">
   <meta itemprop="description" content="...">
   <h1 itemprop="headline">严格遵循 nojs.club：修复 P0 到 P3 级别问题</h1>
   <time datetime="2026-05-16" itemprop="datePublished dateModified">2026-05-16</time>
@@ -125,7 +125,7 @@ Markdown 文章里的图片之前只会自动补 `loading="lazy"`。这次继续
 404 页面之前会输出：
 
 ```html
-<link rel="canonical" href="https://PureMo-Blog.vercel.app/404.html">
+<link rel="canonical" href="https://aonote.vercel.app/404.html">
 ```
 
 这对错误页面来说并不理想。404 页面本身不应该被搜索引擎收录，也不需要声明规范 URL。现在 404 页改为输出：

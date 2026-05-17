@@ -12,7 +12,7 @@ from pymdownx import emoji
 # 当你在设置了自定义域名的时候，你也需要修改 BASE_URL 配置项为对应的链接
 # 也就是最终的访问链接
 
-BASE_URL = "https://PureMo-Blog.vercel.app"
+BASE_URL = "https://aonote.vercel.app"
 
 # 假设你的网站部署在 GitHub Pages 且不是 username.github.io 的链接
 # 而是 https://username.github.io/your-repo-name/
@@ -27,12 +27,12 @@ SITE_ROOT = REPO_SUBPATH.rstrip('/')
 # 这里是博客的标题、描述、作者
 
 # 这里是网站的标题
-BLOG_TITLE = "PureMo-Blog 的个人网站"
+BLOG_TITLE = "Aonote 青笺"
 
 # 描述，通常作为描述信息在搜索引擎的结果页面或者社交链接分享的时候链接中显示
-BLOG_DESCRIPTION = "专注于数据科学、极简主义与纯粹的 Web 技术。"
+BLOG_DESCRIPTION = "一处记录数据科学、极简主义与纯粹 Web 技术的静态笔记。"
 # 作者，主要作用于网站页脚的位置进行显示
-BLOG_AUTHOR = "PureMo-Blog"
+BLOG_AUTHOR = "Aonote"
 
 # 站点界面语言。可选值参考 i18n.py，例如 "zh-CN" 或 "en"。
 SITE_LANGUAGE = "zh-CN"
@@ -49,7 +49,7 @@ CODE_HIGHLIGHT_CLASS = 'highlight'
 
 # 页脚内容配置 - 可选值: 'build_time', 'empty', 'custom'
 FOOTER_CONTENT_TYPE = 'build_time'  # 默认显示构建时间
-FOOTER_CUSTOM_TEXT = 'Powered by My Blog Generator'  # 自定义文本内容
+FOOTER_CUSTOM_TEXT = 'Powered by Aonote'  # 自定义文本内容
 
 # config.py 中添加完整的版权配置
 # --- 版权声明配置 ---

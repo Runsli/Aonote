@@ -1,17 +1,71 @@
-# PureMo-Blog
+# Aonote 青笺
 
-PureMo-Blog 是一个用 Python 编写的极简静态博客生成器。它把 `markdown/` 中的文章转换为纯 HTML/CSS 页面，不依赖前端框架，也不需要浏览器执行 JavaScript。
+Aonote 青笺是一个用 Python 编写的极简静态博客生成器。它把 `markdown/` 中的文章转换为纯 HTML/CSS 页面，不依赖前端框架，也不需要浏览器执行 JavaScript。
 
-在线演示：[PureMo-Blog.vercel.app](https://PureMo-Blog.vercel.app)
+在线演示：[aonote.vercel.app](https://aonote.vercel.app)
 
-## 特性
+## 功能概览
 
-- **纯静态输出**：构建结果位于 `_site/`，可以直接部署到 Vercel、Netlify、GitHub Pages、Cloudflare Pages 等静态托管平台。
-- **严格 no-JS 取向**：模板不输出可执行脚本，结构化数据使用 Microdata，部署配置中也声明了 `script-src 'none'`。
-- **Markdown 写作体验**：支持 Front Matter、目录、代码高亮、表格、任务列表、提示块、删除线等常用语法。
-- **SEO 与分享信息**：自动生成 `sitemap.xml`、`robots.txt`、`rss.xml`、`atom.xml`，页面包含 canonical、Open Graph、Twitter Card 与文章时间元信息。
-- **无障碍与性能优化**：包含跳转主内容链接、暗色模式、减少动态效果适配、图片懒加载、异步解码、CSS 压缩与正确的 404 页面。
-- **构建后健康检查**：构建结束后自动检查 no-JS、站内链接、图片资源、基础 SEO 元信息和常见无障碍问题。
+Aonote 青笺的定位是一个偏文档、偏博客的 no-JS 静态站生成器。它关注内容长期可读、页面结构清晰、构建结果容易部署，以及在不依赖浏览器端 JavaScript 的前提下保留足够好的阅读体验。
+
+### 内容生成
+
+- 从 `markdown/` 读取 Markdown 文件，并根据 Front Matter 生成文章页、首页、归档页、标签页、关于页和 404 页面。
+- 支持 `title`、`date`、`summary`、`tags`、`hidden` 等常用元信息，隐藏页面不会进入普通文章列表。
+- 首页按发布时间展示最新文章，归档页按年份组织文章，标签页自动生成标签索引和标签详情页。
+- 构建产物输出到 `_site/`，可以直接作为静态目录部署。
+- 支持增量构建，只有内容、模板、配置或样式变化时才重新生成必要页面。
+
+### Markdown 写作
+
+- 支持标题锚点、自动目录、脚注、定义列表、任务列表、提示块、表格、删除线、Emoji 短代码和数学公式。
+- 数学公式在构建期转为静态 MathML，不需要前端脚本渲染。
+- 支持 Pygments 代码高亮、代码块语言识别、代码块标题、指定行高亮和长代码行横向滚动。
+- 支持 `diff` / `patch` 代码块的加减行高亮，并为新增行、删除行补充屏幕阅读器标签。
+- 支持表格标题语法，例如 `表格：示例说明`，构建时会生成语义化 `<caption>`。
+- 示例文档已按主题拆分为基础排版、代码与媒体、表格与 no-JS 组件，便于查看实际渲染效果。
+
+### no-JS 与交互
+
+- 模板默认不输出可执行 JavaScript，页面目标是文档而不是 Web App。
+- 结构化数据使用 Microdata，避免 JSON-LD `<script>`。
+- 移动端导航、移动端目录、折叠内容、返回顶部、锚点跳转等交互均使用 HTML/CSS 原生能力。
+- 部署配置中设置了 `script-src 'none'`，帮助保持 no-JS 约束。
+- 自动生成空的 Chrome DevTools 噪音文件，减少无关 404 请求干扰。
+
+### SEO、订阅与分享
+
+- 自动生成 `sitemap.xml`、`robots.txt`、`rss.xml` 和 `atom.xml`。
+- RSS 和 Atom 包含文章标题、摘要、正文内容、分类标签、作者、发布时间和更新时间。
+- 页面自动输出 canonical、Open Graph、Twitter Card、文章发布时间和修改时间等元信息。
+- 404 页面使用真实 `_site/404.html`，并配置 `noindex`，避免错误页面被搜索引擎收录。
+- 支持 `BASE_URL` 和 `REPO_SUBPATH`，适配自定义域名、根路径部署和 GitHub Pages 子路径部署。
+
+### 无障碍
+
+- 页面包含跳转主内容链接、语义化导航、当前页面状态、可见键盘焦点和 `prefers-reduced-motion` 适配。
+- 代码块、表格横向滚动区域、移动端目录和原生折叠块均考虑键盘访问。
+- 图片会检查缺失或过于泛化的 `alt` 文本。
+- 表格滚动容器会补充 `role="region"`、`tabindex` 和可访问名称。
+- 脚注引用、脚注返回链接、任务列表状态、diff 行语义均补充了屏幕阅读器友好的标签。
+- 健康检查可以输出焦点顺序报告，辅助人工检查键盘导航体验。
+
+### 视觉与性能
+
+- 内置浅色/暗色模式，代码高亮使用 GitHub Light 与 GitHub Dark Dimmed 风格。
+- CSS 使用变量组织颜色、间距、圆角、阴影、焦点样式和响应式断点。
+- 构建时压缩 CSS，并生成带内容哈希的 CSS 文件名，方便长期缓存。
+- HTML 可选压缩，会保留 `pre`、`textarea`、`script`、`style` 等对空白敏感的内容。
+- 图片默认补充懒加载、异步解码和尺寸信息，减少布局偏移。
+- 锚点跳转使用统一的 `scroll-margin-top`，避免标题被顶部栏遮挡。
+
+### 构建健康检查
+
+- `autobuild.py` 构建结束后会自动运行 `check_site.py`。
+- 检查项覆盖 no-JS、站内链接、锚点、图片资源、基础 SEO、RSS/Atom、重复 ID、标题层级、表格、代码块、脚注和任务列表。
+- 报告按 `A11Y`、`SEO`、`Links`、`Assets`、`Feeds`、`No-JS`、`Build` 分类展示。
+- 构建清单只会在健康检查通过后更新，避免失败构建污染增量构建状态。
+- 可以单独运行 `python check_site.py --focus-report` 输出每个页面的可聚焦元素顺序。
 
 ## 环境要求
 
@@ -68,14 +122,17 @@ python -m http.server 8000
 ## 目录结构
 
 ```text
-PureMo-Blog/
+Aonote/
 ├── assets/
 │   └── style.css              # 站点样式
 ├── static/                    # 直接复制到站点根路径 /static/ 的静态资源
 ├── markdown/                  # Markdown 文章和特殊页面
-│   ├── 01.md
-│   ├── 02.md
-│   ├── 03.md
+│   ├── welcome-to-aonote.md
+│   ├── markdown-basics.md
+│   ├── nojs-compliance-fixes.md
+│   ├── blog-ui-ux-refactor.md
+│   ├── code-and-media-examples.md
+│   ├── tables-and-nojs-components.md
 │   ├── 404.md
 │   └── about.md
 ├── templates/
@@ -106,7 +163,7 @@ python check_site.py --focus-report
 
 ## 写一篇文章
 
-在 `markdown/` 目录中新建 `.md` 文件，例如 `markdown/04.md`：
+在 `markdown/` 目录中新建 `.md` 文件，文件名建议使用小写 kebab-case，例如 `markdown/my-first-post.md`：
 
 ```md
 ---
@@ -124,6 +181,7 @@ tags: [blog, python]
 常用 Front Matter：
 
 - `title`：文章标题。
+- `slug`：可选的文章 URL 标识；如果省略，会从文件名推导，例如 `my-first-post.md` 会生成 `/posts/my-first-post/`。
 - `date`：发布日期，格式建议为 `YYYY-MM-DD`。
 - `summary`：文章摘要，会用于列表页、RSS 和页面描述。
 - `tags`：标签列表，例如 `[python, blog]`。
@@ -160,15 +218,15 @@ python autobuild.py
 - [ ] 未完成
 
 ```python
-print("Hello PureMo-Blog")
+print("Hello Aonote")
 ```
 
 ```python title="hello.py"
-print("Hello PureMo-Blog")
+print("Hello Aonote")
 ```
 
 ```python title="hello.py" hl_lines="2"
-message = "Hello PureMo-Blog"
+message = "Hello Aonote"
 print(message)
 ```
 
@@ -248,7 +306,7 @@ Netlify 会自动使用 `_site/404.html` 作为真实 404 页面。不要把所�
 
 ## no-JS 说明
 
-PureMo-Blog 的页面目标是作为文档存在，而不是 Web App。当前默认输出具备以下约束：
+Aonote 青笺的页面目标是作为文档存在，而不是 Web App。当前默认输出具备以下约束：
 
 - 不输出可执行 JavaScript。
 - 结构化数据使用 Microdata，而不是 JSON-LD `<script>`。
