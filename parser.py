@@ -18,6 +18,23 @@ def _get_i18n() -> Dict[str, Any]:
     return get_translations(getattr(config, 'SITE_LANGUAGE', 'zh-CN'))
 
 
+def _prepend_hidden_label(soup: BeautifulSoup, element, label: str) -> None:
+    if element.find(class_='diff-line-label'):
+        return
+    hidden_label = soup.new_tag('span', attrs={'class': 'diff-line-label visually-hidden'})
+    hidden_label.string = label
+    element.insert(0, hidden_label)
+
+
+def _add_diff_line_semantics(soup: BeautifulSoup, pre, i18n: Dict[str, Any]) -> None:
+    added_label = i18n.get('diff_added_line_label', 'Added line: ')
+    removed_label = i18n.get('diff_removed_line_label', 'Removed line: ')
+    for added_line in pre.select('.gi'):
+        _prepend_hidden_label(soup, added_line, added_label)
+    for removed_line in pre.select('.gd'):
+        _prepend_hidden_label(soup, removed_line, removed_label)
+
+
 def _read_image_dimensions(image_path: str) -> Optional[Tuple[int, int]]:
     """用标准库读取常见图片尺寸，避免为懒加载图片引入布局偏移。"""
     try:
@@ -658,6 +675,8 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
 
             pre['data-lang'] = language_label
             pre['aria-label'] = i18n.get('code_block_language_label', 'Code block, language {language}').format(language=language_label)
+            if language_label == 'DIFF':
+                _add_diff_line_semantics(soup, pre, i18n)
             if parent and 'highlight' in parent.get('class', []):
                 parent['data-lang'] = language_label
             code = pre.find('code')

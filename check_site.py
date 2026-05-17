@@ -176,6 +176,14 @@ def _check_accessibility(html: str, page_label: str) -> Tuple[List[str], List[st
         if pre.get("tabindex") != "0":
             warnings.append(f"{page_label}: code block is not keyboard-scrollable")
 
+    for diff_block in soup.select('.highlight[data-lang="DIFF"]'):
+        for added_line in diff_block.select(".gi"):
+            if not added_line.select_one(".diff-line-label"):
+                warnings.append(f"{page_label}: diff added line missing screen-reader label")
+        for removed_line in diff_block.select(".gd"):
+            if not removed_line.select_one(".diff-line-label"):
+                warnings.append(f"{page_label}: diff removed line missing screen-reader label")
+
     for element in soup.find_all(attrs={"aria-label": True}):
         if not element.get("aria-label", "").strip():
             errors.append(f"{page_label}: empty aria-label on <{element.name}>")
