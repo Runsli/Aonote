@@ -101,6 +101,34 @@ def _add_footnote_semantics(soup: BeautifulSoup, i18n: Dict[str, Any]) -> None:
         backref['title'] = label
 
 
+def _add_task_list_semantics(soup: BeautifulSoup, i18n: Dict[str, Any]) -> None:
+    completed_template = i18n.get('task_completed_label', 'Completed task: {task}')
+    incomplete_template = i18n.get('task_incomplete_label', 'Incomplete task: {task}')
+    completed_state = i18n.get('task_completed_state', 'Completed')
+    incomplete_state = i18n.get('task_incomplete_state', 'Incomplete')
+
+    for item in soup.select('li.task-list-item'):
+        checkbox = item.find('input', attrs={'type': 'checkbox'})
+        if not checkbox:
+            continue
+
+        task_text = " ".join(item.get_text(" ", strip=True).split())
+        is_completed = checkbox.has_attr('checked')
+        label = completed_template.format(task=task_text) if is_completed else incomplete_template.format(task=task_text)
+        checkbox['aria-label'] = label
+        checkbox['aria-disabled'] = 'true'
+        item['data-task-state'] = 'completed' if is_completed else 'incomplete'
+
+        if not item.find(class_='task-state-label'):
+            state_label = soup.new_tag('span', attrs={'class': 'task-state-label visually-hidden'})
+            state_label.string = f"{completed_state if is_completed else incomplete_state}: "
+            control = item.find(class_='task-list-control')
+            if control:
+                control.insert_after(state_label)
+            else:
+                item.insert(0, state_label)
+
+
 def _read_image_dimensions(image_path: str) -> Optional[Tuple[int, int]]:
     """用标准库读取常见图片尺寸，避免为懒加载图片引入布局偏移。"""
     try:
@@ -668,12 +696,13 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
     # [重构] UI 增强：图片懒加载 (Lazy Load) 和表格包裹器
     # -------------------------------------------------------------------------
     # 使用 BeautifulSoup 来进行安全、可靠的 HTML 变换
-    if '<img' in content_html or '<table' in content_html or '<pre' in content_html or 'arithmatex' in content_html or 'footnote' in content_html:
+    if '<img' in content_html or '<table' in content_html or '<pre' in content_html or 'arithmatex' in content_html or 'footnote' in content_html or 'task-list' in content_html:
         soup = BeautifulSoup(content_html, 'html.parser')
         i18n = _get_i18n()
 
         _render_mathml(soup)
         _add_footnote_semantics(soup, i18n)
+        _add_task_list_semantics(soup, i18n)
 
         # 1. 图片懒加载 (Lazy Load)
         for img in soup.find_all('img'):

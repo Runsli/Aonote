@@ -214,6 +214,18 @@ def _check_accessibility(html: str, page_label: str) -> Tuple[List[str], List[st
         if title and "Jump back" in title:
             warnings.append(f"{page_label}: footnote back reference title is not localized")
 
+    for task_item in soup.select("li.task-list-item"):
+        checkbox = task_item.find("input", attrs={"type": "checkbox"})
+        if not checkbox:
+            warnings.append(f"{page_label}: task list item missing checkbox")
+            continue
+        if not checkbox.get("aria-label", "").strip():
+            warnings.append(f"{page_label}: task checkbox missing aria-label")
+        if checkbox.get("aria-disabled") != "true":
+            warnings.append(f"{page_label}: static task checkbox missing aria-disabled")
+        if not task_item.select_one(".task-state-label"):
+            warnings.append(f"{page_label}: task item missing screen-reader state label")
+
     for element in soup.find_all(attrs={"aria-label": True}):
         if not element.get("aria-label", "").strip():
             errors.append(f"{page_label}: empty aria-label on <{element.name}>")
