@@ -834,7 +834,7 @@ main {
     display: block;
     margin: 0 -15px;
     padding: 0 15px;
-    background-color: rgba(0, 121, 107, 0.1);
+    background-color: rgba(0, 0, 0, 0.035);
     box-shadow: inset 3px 0 0 rgba(0, 121, 107, 0.42);
 }
 
@@ -844,7 +844,7 @@ main {
     }
 
     .post-content .highlight .hll {
-        background-color: rgba(128, 203, 196, 0.12);
+        background-color: rgba(255, 255, 255, 0.045);
         box-shadow: inset 3px 0 0 rgba(128, 203, 196, 0.48);
     }
 }
@@ -909,15 +909,21 @@ main {
     .post-content .highlight[data-lang] {
         background-image: linear-gradient(
             to bottom,
-            rgba(255, 255, 255, 0.025) 0,
-            rgba(255, 255, 255, 0.025) 32px,
+            rgba(255, 255, 255, 0.045) 0,
+            rgba(255, 255, 255, 0.045) 32px,
             transparent 32px
         );
     }
 
+    .post-content .highlight::before,
+    .post-content .highlight::after {
+        color: #b8c1cc;
+        opacity: 1;
+    }
+
     .post-content .highlight[data-title] pre,
     .post-content .highlight[data-lang] pre {
-        border-top-color: rgba(255, 255, 255, 0.08);
+        border-top-color: rgba(255, 255, 255, 0.12);
     }
 }
 
@@ -2537,7 +2543,7 @@ button:focus,
 
 @media (prefers-color-scheme: dark) {
     .highlight {
-        color: #e0e0e0 !important;
+        color: #e6edf3 !important;
         background: transparent !important;
     }
 
@@ -2547,7 +2553,7 @@ button:focus,
     }
 
     .highlight .hll {
-        background-color: rgba(128, 203, 196, 0.1);
+        background-color: rgba(255, 255, 255, 0.045);
     }
 
     .highlight .c,
@@ -2556,7 +2562,7 @@ button:focus,
     .highlight .cs,
     .highlight .go,
     .highlight .gp {
-        color: #8b949e;
+        color: #9aa4ad;
     }
 
     .highlight .k,
@@ -2568,7 +2574,7 @@ button:focus,
     .highlight .ow,
     .highlight .kt,
     .highlight .nt {
-        color: #80cbc4;
+        color: #c792ea;
     }
 
     .highlight .s,
@@ -2582,7 +2588,7 @@ button:focus,
     .highlight .sr,
     .highlight .ss,
     .highlight .sx {
-        color: #c3b178;
+        color: #c3e88d;
     }
 
     .highlight .m,
@@ -2591,15 +2597,12 @@ button:focus,
     .highlight .mi,
     .highlight .mo,
     .highlight .il {
-        color: #b6a7ff;
+        color: #f78c6c;
     }
 
     .highlight .na,
     .highlight .nb,
-    .highlight .nc,
-    .highlight .ne,
     .highlight .nf,
-    .highlight .nn,
     .highlight .bp,
     .highlight .no,
     .highlight .nd,
@@ -2607,25 +2610,32 @@ button:focus,
     .highlight .vc,
     .highlight .vg,
     .highlight .vi {
-        color: #d7dde3;
+        color: #82aaff;
+    }
+
+    .highlight .nc,
+    .highlight .ne,
+    .highlight .nn {
+        color: #ffcb6b;
+        font-weight: 650;
     }
 
     .highlight .o,
     .highlight .p {
-        color: #b0bec5;
+        color: #c9d1d9;
     }
 
     .highlight .cp,
     .highlight .gh,
     .highlight .gu {
-        color: #b0bec5;
+        color: #c9d1d9;
     }
 
     .highlight .err,
     .highlight .gr,
     .highlight .gt,
     .highlight .gd {
-        color: #ff8a80;
+        color: #ff6b6b;
     }
 
     .highlight .gi {
