@@ -101,6 +101,9 @@
                     {% endif %}
 
                     {%- endif -%}
+                    {%- if page_id != 'post' and page_id != 'tag' -%}
+                    <h1 class="visually-hidden">{{page_title}}</h1>
+                    {%- endif -%}
                 </div>
 
                 {# --- 列表页面 (首页, 标签详情, 归档) --- #}

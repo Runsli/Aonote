@@ -11,6 +11,7 @@ PureMo-Blog 是一个用 Python 编写的极简静态博客生成器。它把 `m
 - **Markdown 写作体验**：支持 Front Matter、目录、代码高亮、表格、任务列表、提示块、删除线等常用语法。
 - **SEO 与分享信息**：自动生成 `sitemap.xml`、`robots.txt`、`rss.xml`，页面包含 canonical、Open Graph、Twitter Card 与文章时间元信息。
 - **无障碍与性能优化**：包含跳转主内容链接、暗色模式、减少动态效果适配、图片懒加载、异步解码、CSS 压缩与正确的 404 页面。
+- **构建后健康检查**：构建结束后自动检查 no-JS、站内链接、图片资源和基础 SEO 元信息。
 
 ## 环境要求
 
@@ -70,6 +71,7 @@ python -m http.server 8000
 PureMo-Blog/
 ├── assets/
 │   └── style.css              # 站点样式
+├── static/                    # 直接复制到站点根路径 /static/ 的静态资源
 ├── markdown/                  # Markdown 文章和特殊页面
 │   ├── 01.md
 │   ├── 02.md
@@ -82,12 +84,19 @@ PureMo-Blog/
 ├── parser.py                  # Markdown 解析与 HTML 后处理
 ├── generator.py               # 页面、RSS、Sitemap 生成逻辑
 ├── autobuild.py               # 构建入口
+├── check_site.py              # 构建后健康检查
 ├── netlify.toml               # Netlify 构建与安全响应头
 ├── vercel.json                # Vercel 构建与安全响应头
 └── requirements.txt
 ```
 
 构建后会生成 `_site/`。该目录是构建产物，默认不需要提交到 Git。
+
+构建脚本会在写入增量构建清单前自动运行健康检查；如需单独检查已有构建产物，可以运行：
+
+```bash
+python check_site.py
+```
 
 ## 写一篇文章
 

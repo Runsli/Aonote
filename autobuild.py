@@ -14,6 +14,7 @@ import shlex
 import config
 from parser import get_metadata_and_content
 import generator
+import check_site
 
 # 尝试导入csscompressor，如果未安装则使用基础压缩
 try:
@@ -354,6 +355,7 @@ def build_site():
         'generator.py', 
         'config.py',
         'i18n.py',
+        'check_site.py',
         # 重要的模板文件
         os.path.join('templates', 'post.html'),
         os.path.join('templates', 'list.html'),
@@ -657,8 +659,12 @@ def build_site():
     else:
         print("   -> [SKIPPED] Index, Archive, Tags, RSS (No post data or Theme change)")
 
+    print("\n[post] Running site health checks...")
+    if not check_site.run_checks(config.BUILD_DIR):
+        raise SystemExit(1)
+
     # 3. 保存新的构建清单
-    # ⭐ 修复: 保存 new_manifest，其中包含 posts, static_files, templates 的哈希值
+    # ⭐ 修复: 只有健康检查通过后才保存 new_manifest，避免失败构建污染增量状态
     save_manifest(new_manifest)
     print("   -> Manifest file updated.")
     
