@@ -170,6 +170,12 @@ def _check_accessibility(html: str, page_label: str) -> Tuple[List[str], List[st
         elif alt.strip().lower() in {"图片", "示例图片", "image", "photo", "picture"}:
             warnings.append(f"{page_label}: image alt text is too generic {src!r}")
 
+    for pre in soup.find_all("pre"):
+        if not pre.get("aria-label", "").strip():
+            warnings.append(f"{page_label}: code block missing aria-label")
+        if pre.get("tabindex") != "0":
+            warnings.append(f"{page_label}: code block is not keyboard-scrollable")
+
     for element in soup.find_all(attrs={"aria-label": True}):
         if not element.get("aria-label", "").strip():
             errors.append(f"{page_label}: empty aria-label on <{element.name}>")

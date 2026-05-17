@@ -95,9 +95,9 @@
                     {% if toc_html %}
                     <details class="mobile-toc">
                         <summary>{{i18n.toc}}</summary>
-                        <div class="mobile-toc-content">
+                        <nav class="mobile-toc-content" aria-label="{{i18n.toc}}">
                             {{ toc_html | safe }}
-                        </div>
+                        </nav>
                     </details>
                     {% endif %}
 
@@ -277,10 +277,10 @@
             </div>
 
             {%- if page_id == 'post' and toc_html -%}
-            <div class="toc-area">
+            <nav class="toc-area" aria-label="{{i18n.toc}}">
                 <h3>{{i18n.toc}}</h3>
                 {{toc_html | safe}}
-            </div>
+            </nav>
             {%- endif -%}
         </div>
     </main>

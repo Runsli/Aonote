@@ -10,7 +10,12 @@ from typing import Dict, Any, Tuple, Optional, List
 import config 
 import unicodedata 
 from bs4 import BeautifulSoup # 引入 BeautifulSoup
+from i18n import get_translations
 from latex2mathml.converter import convert as convert_latex_to_mathml
+
+
+def _get_i18n() -> Dict[str, Any]:
+    return get_translations(getattr(config, 'SITE_LANGUAGE', 'zh-CN'))
 
 
 def _read_image_dimensions(image_path: str) -> Optional[Tuple[int, int]]:
@@ -634,8 +639,11 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
             wrapper_div.append(table)
 
         # 3. 代码块语言标签
+        i18n = _get_i18n()
         for pre in soup.find_all('pre'):
             language_label, code_title = _detect_code_block_metadata(pre, fenced_code_blocks)
+            pre['tabindex'] = '0'
+            pre['aria-label'] = i18n.get('code_block_label', 'Code block')
             if not language_label and not code_title:
                 continue
 
@@ -649,6 +657,7 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
                 continue
 
             pre['data-lang'] = language_label
+            pre['aria-label'] = i18n.get('code_block_language_label', 'Code block, language {language}').format(language=language_label)
             if parent and 'highlight' in parent.get('class', []):
                 parent['data-lang'] = language_label
             code = pre.find('code')

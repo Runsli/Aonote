@@ -99,6 +99,8 @@
     --reading-width: 68ch;
     --header-offset: 90px;
     --header-offset-mobile: 82px;
+    --focus-ring-color: var(--color-primary);
+    --focus-ring-shadow: 0 0 0 4px rgba(0, 121, 107, 0.16);
 
     --font-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, var(--font-emoji), sans-serif;
@@ -113,6 +115,8 @@
         --color-main-background: var(--color-background-dark);
         --color-main-card: var(--color-card-dark);
         --color-main-border: var(--color-border-light);
+        --focus-ring-color: var(--color-link-dark);
+        --focus-ring-shadow: 0 0 0 4px rgba(128, 203, 196, 0.18);
     }
 }
 
@@ -155,6 +159,10 @@ a:focus {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
     border-radius: 2px;
+}
+
+a:focus:not(:focus-visible) {
+    outline: none;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1229,12 +1237,14 @@ main {
     padding-left: 5px;
     margin-left: -5px;
     border-left: 5px solid var(--color-primary);
-    transition: background-color 0.5s ease-out;
+    scroll-margin-top: calc(var(--header-offset) + var(--space-md));
+    transition: background-color 0.5s ease-out, border-color 0.5s ease-out;
 }
 
 @media (prefers-color-scheme: dark) {
     .post-content :target {
         background-color: rgba(0, 121, 107, 0.1);
+        border-left-color: var(--color-link-dark);
     }
 }
 
@@ -1999,21 +2009,44 @@ footer {
     border: 2px solid white;
 }
 
-a:focus,
-button:focus,
-.tag-cloud-item:focus {
-    outline: none;
-    outline: 2px solid var(--color-primary);
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+.button:focus-visible,
+.button-secondary:focus-visible,
+.tag-badge:focus-visible,
+.tag-cloud-item:focus-visible,
+.post-title-link:focus-visible,
+.archive-link:focus-visible,
+.feed-url:focus-visible,
+.toc-area a:focus-visible,
+.mobile-toc-content a:focus-visible,
+.mobile-nav-links a:focus-visible,
+.back-to-top:focus-visible {
+    outline: 2px solid var(--focus-ring-color);
     outline-offset: 2px;
-    border-radius: 2px;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--focus-ring-shadow);
+}
+
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible),
+summary:focus:not(:focus-visible) {
+    outline: none;
     box-shadow: none;
 }
 
-.post-content pre a:focus,
-.post-content code a:focus {
+.post-content pre a:focus-visible,
+.post-content code a:focus-visible {
     box-shadow: none;
     outline: 2px dotted currentColor;
     border-radius: 0;
+}
+
+.post-content pre:focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: -4px;
+    box-shadow: inset var(--focus-ring-shadow);
 }
 
 /* =========================================
@@ -2179,8 +2212,9 @@ button:focus,
     }
 
     .mobile-nav-menu summary:focus-visible {
-        outline: 2px solid var(--color-primary);
+        outline: 2px solid var(--focus-ring-color);
         outline-offset: 2px;
+        box-shadow: var(--focus-ring-shadow);
     }
 
     .mobile-nav-links {
@@ -2920,24 +2954,22 @@ button:focus,
         font-family: var(--font-mono) !important;
     }
 }
-/* 修复锚点定位被头部遮挡的问题 */
 html {
-    scroll-margin-top: var(--header-offset);
+    scroll-padding-top: calc(var(--header-offset) + var(--space-md));
 }
 
-/* 对于特定的锚点，确保它们不会被头部遮挡 */
 :target {
-    scroll-margin-top: var(--header-offset);
+    scroll-margin-top: calc(var(--header-offset) + var(--space-md));
 }
 
-/* 如果使用id锚点，可以专门设置 */
-#top {
-    scroll-margin-top: 0;
-    position: relative;
-    top: calc(var(--header-offset) * -1);
-    display: block;
-    height: var(--header-offset);
-    visibility: hidden;
+@media (max-width: 768px) {
+    html {
+        scroll-padding-top: calc(var(--header-offset-mobile) + var(--space-md));
+    }
+
+    :target {
+        scroll-margin-top: calc(var(--header-offset-mobile) + var(--space-md));
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
