@@ -46,6 +46,7 @@ BASE_URL = "https://your-domain.example"
 BLOG_TITLE = "你的站点标题"
 BLOG_DESCRIPTION = "你的站点描述"
 BLOG_AUTHOR = "你的名字"
+SITE_LANGUAGE = "zh-CN"
 ```
 
 4. 构建站点。
@@ -184,6 +185,7 @@ python autobuild.py
 主要配置集中在 `config.py`：
 
 - 站点信息：`BASE_URL`、`BLOG_TITLE`、`BLOG_DESCRIPTION`、`BLOG_AUTHOR`。
+- 界面语言：`SITE_LANGUAGE`，固定 UI 文案来自 `i18n.py`，当前内置 `zh-CN` 和 `en`。
 - 路径配置：`REPO_SUBPATH`、`BUILD_DIR`、`MARKDOWN_DIR`。
 - Markdown 扩展：`MARKDOWN_EXTENSIONS`、`MARKDOWN_EXTENSION_CONFIGS`。
 - 版权信息：`COPYRIGHT_LICENSE`。

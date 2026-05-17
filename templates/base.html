@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
+<html lang="{{site_language}}">
 
 <head>
     <meta charset="UTF-8">
@@ -33,17 +33,16 @@
 </head>
 
 <body class="page-{{page_id}}">
-    <a href="#main-content" class="skip-link">跳到主内容</a>
+    <a href="#main-content" class="skip-link">{{i18n.skip_to_content}}</a>
 
     <header>
         <div class="header-inner">
             <a href="{{site_root}}/" class="site-title">{{blog_title}}</a>
-            <!-- 在 base.html 中改进导航 -->
-            <nav aria-label="主导航">
-                <a href="{{site_root}}/" {% if page_id=='index' %}aria-current="page" {% endif %}>首页</a>
-                <a href="{{site_root}}/archive/" {% if page_id=='archive' %}aria-current="page" {% endif %}>归档</a>
-                <a href="{{site_root}}/tags/" {% if page_id=='tags' %}aria-current="page" {% endif %}>标签</a>
-                <a href="{{site_root}}/about/" {% if page_id=='about' %}aria-current="page" {% endif %}>关于</a>
+            <nav aria-label="{{i18n.main_navigation}}">
+                <a href="{{site_root}}/" {% if page_id=='index' %}aria-current="page" {% endif %}>{{i18n.nav_home}}</a>
+                <a href="{{site_root}}/archive/" {% if page_id=='archive' %}aria-current="page" {% endif %}>{{i18n.nav_archive}}</a>
+                <a href="{{site_root}}/tags/" {% if page_id=='tags' %}aria-current="page" {% endif %}>{{i18n.nav_tags}}</a>
+                <a href="{{site_root}}/about/" {% if page_id=='about' %}aria-current="page" {% endif %}>{{i18n.nav_about}}</a>
             </nav>
         </div>
     </header>
@@ -82,7 +81,7 @@
                     {# 移动端目录 #}
                     {% if toc_html %}
                     <details class="mobile-toc">
-                        <summary>目录</summary>
+                        <summary>{{i18n.toc}}</summary>
                         <div class="mobile-toc-content">
                             {{ toc_html | safe }}
                         </div>
@@ -98,8 +97,8 @@
                 {%- if page_id == 'tag' -%}
                 <div class="tag-meta-info">
                     <h1 class="page-list-title"># {{tag}}</h1>
-                    <p class="tag-count">共 {{posts | length}} 篇文章</p>
-                    <a href="{{site_root}}/tags/" class="button button-secondary button-small">← 所有标签</a>
+                    <p class="tag-count">{{i18n.tag_post_count.format(count=posts | length)}}</p>
+                    <a href="{{site_root}}/tags/" class="button button-secondary button-small">← {{i18n.all_tags}}</a>
                 </div>
                 <hr class="section-divider">
                 {%- endif -%}
@@ -135,9 +134,9 @@
                     {% else %}
                     <p class="empty-state">
                         {%- if page_id == 'tag' -%}
-                        暂无文章。
+                        {{i18n.no_posts}}
                         {%- else -%}
-                        暂无文章。
+                        {{i18n.no_posts}}
                         {%- endif -%}
                     </p>
                     {% endfor %}
@@ -146,7 +145,7 @@
 
                 {%- if page_id == 'index' and posts|length == max_posts_on_index -%}
                 <div class="read-more-link-area">
-                    <a href="{{site_root}}/archive/" class="button button-secondary">查看全部归档 →</a>
+                    <a href="{{site_root}}/archive/" class="button button-secondary">{{i18n.read_all_archive}} →</a>
                 </div>
                 {%- endif -%}
 
@@ -237,7 +236,7 @@
                 <nav class="post-navigation">
                     {% if prev_post_nav %}
                     <a href="{{prev_post_nav.link}}" class="nav-link nav-prev">
-                        <small>← 上一篇 (较新)</small>
+                        <small>← {{i18n.prev_post}}</small>
                         <h3>{{prev_post_nav.title}}</h3>
                     </a>
                     {% else %}
@@ -246,7 +245,7 @@
 
                     {% if next_post_nav %}
                     <a href="{{next_post_nav.link}}" class="nav-link nav-next">
-                        <small>下一篇 (较旧) →</small>
+                        <small>{{i18n.next_post}} →</small>
                         <h3>{{next_post_nav.title}}</h3>
                     </a>
                     {% else %}
@@ -263,7 +262,7 @@
 
             {%- if page_id == 'post' and toc_html -%}
             <div class="toc-area">
-                <h3>目录</h3>
+                <h3>{{i18n.toc}}</h3>
                 {{toc_html | safe}}
             </div>
             {%- endif -%}
@@ -276,8 +275,8 @@
                 <span class="copyright-info">&copy; {{current_year}} {{blog_author}}.</span>
             </div>
             <div class="footer-right">
-                <a href="{{site_root}}/feed/">RSS 订阅</a>
-                <a href="#main-content" class="back-to-top">返回顶部</a>
+                <a href="{{site_root}}/feed/">{{i18n.rss_subscribe}}</a>
+                <a href="#main-content" class="back-to-top">{{i18n.back_to_top}}</a>
             </div>
         </div>
     </footer>

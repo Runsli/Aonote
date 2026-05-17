@@ -11,6 +11,7 @@ import json
 import re 
 import html
 import config
+from i18n import get_translations
 from parser import tag_to_slug 
 from bs4 import BeautifulSoup 
 
@@ -54,6 +55,20 @@ def minify_html_content(html_content: str) -> str:
 def write_html_file(output_path: str, html_content: str) -> None:
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(minify_html_content(html_content))
+
+
+def get_i18n() -> Dict[str, str]:
+    return get_translations(getattr(config, 'SITE_LANGUAGE', 'zh-CN'))
+
+
+def render_template(template, context: Dict[str, Any]) -> str:
+    i18n = get_i18n()
+    template_context = {
+        'i18n': i18n,
+        'site_language': i18n.get('html_lang', 'zh-cn'),
+        **context,
+    }
+    return template.render(template_context)
 
 
 # --- 辅助函数：路径和 URL (核心路径修正) ---
@@ -222,13 +237,14 @@ def get_json_ld_schema(post: Dict[str, Any]) -> str:
 def generate_index_html(sorted_posts: List[Dict[str, Any]], build_time_info: str):
     """生成首页"""
     try:
+        i18n = get_i18n()
         output_path = os.path.join(config.BUILD_DIR, 'index.html')
         visible_posts = [p for p in sorted_posts if not is_post_hidden(p)][:config.MAX_POSTS_ON_INDEX]
 
         template = env.get_template('base.html')
         context = {
             'page_id': 'index',
-            'page_title': "首页",
+            'page_title': i18n['page_home'],
             'blog_title': config.BLOG_TITLE,
             'blog_description': config.BLOG_DESCRIPTION,
             'blog_author': config.BLOG_AUTHOR,
@@ -243,7 +259,7 @@ def generate_index_html(sorted_posts: List[Dict[str, Any]], build_time_info: str
             'footer_custom_text': config.FOOTER_CUSTOM_TEXT,
         }
         
-        html_content = template.render(context)
+        html_content = render_template(template, context)
         write_html_file(output_path, html_content)
         print("Generated: index.html")
     except Exception as e:
@@ -253,6 +269,7 @@ def generate_index_html(sorted_posts: List[Dict[str, Any]], build_time_info: str
 def generate_archive_html(sorted_posts: List[Dict[str, Any]], build_time_info: str):
     """生成归档页 (archive/index.html)"""
     try:
+        i18n = get_i18n()
         output_dir = os.path.join(config.BUILD_DIR, 'archive')
         os.makedirs(output_dir, exist_ok=True)
         output_path = os.path.join(output_dir, 'index.html')
@@ -270,7 +287,7 @@ def generate_archive_html(sorted_posts: List[Dict[str, Any]], build_time_info: s
         archive_html = "<div class=\"archive-page\">\n"
 
         if not sorted_archive:
-            archive_html += "<p class=\"empty-state\">暂无归档。</p>\n"
+            archive_html += f"<p class=\"empty-state\">{i18n['no_archive']}</p>\n"
         else:
             for year, posts in sorted_archive:
                 archive_html += f"<h2 class=\"archive-year\">{year} <small>({len(posts)})</small></h2>\n"
@@ -292,9 +309,9 @@ def generate_archive_html(sorted_posts: List[Dict[str, Any]], build_time_info: s
             
         context = {
             'page_id': 'archive',
-            'page_title': "归档",
+            'page_title': i18n['page_archive'],
             'blog_title': config.BLOG_TITLE,
-            'blog_description': '归档',
+            'blog_description': i18n['page_archive'],
             'blog_author': config.BLOG_AUTHOR,
             'content_html': archive_html, 
             'posts': [],
@@ -307,7 +324,7 @@ def generate_archive_html(sorted_posts: List[Dict[str, Any]], build_time_info: s
             'footer_custom_text': config.FOOTER_CUSTOM_TEXT,
         }
         
-        html_content = template.render(context)
+        html_content = render_template(template, context)
         write_html_file(output_path, html_content)
         print("Generated: archive/index.html")
     except Exception as e:
@@ -317,15 +334,16 @@ def generate_archive_html(sorted_posts: List[Dict[str, Any]], build_time_info: s
 def generate_tags_list_html(tag_map: Dict[str, List[Dict[str, Any]]], build_time_info: str):
     """生成标签列表页"""
     try:
+        i18n = get_i18n()
         output_dir = os.path.join(config.BUILD_DIR, 'tags')
         os.makedirs(output_dir, exist_ok=True)
         output_path = os.path.join(output_dir, 'index.html')
         
         sorted_tags = sorted(tag_map.items(), key=lambda item: len(item[1]), reverse=True)
-        tags_html = "<h1>标签列表</h1>\n<div class=\"tag-cloud\">\n"
+        tags_html = f"<h1>{i18n['tags_list_heading']}</h1>\n<div class=\"tag-cloud\">\n"
 
         if not sorted_tags:
-            tags_html += "<p class=\"empty-state\">暂无标签。</p>\n"
+            tags_html += f"<p class=\"empty-state\">{i18n['no_tags']}</p>\n"
         else:
             for tag, posts in sorted_tags:
                 tag_slug = tag_to_slug(tag)
@@ -337,9 +355,9 @@ def generate_tags_list_html(tag_map: Dict[str, List[Dict[str, Any]]], build_time
         template = env.get_template('base.html')
         context = {
             'page_id': 'tags',
-            'page_title': "标签",
+            'page_title': i18n['page_tags'],
             'blog_title': config.BLOG_TITLE,
-            'blog_description': '标签',
+            'blog_description': i18n['page_tags'],
             'blog_author': config.BLOG_AUTHOR,
             'content_html': tags_html,
             'site_root': get_site_root_prefix(),
@@ -351,7 +369,7 @@ def generate_tags_list_html(tag_map: Dict[str, List[Dict[str, Any]]], build_time
             'footer_custom_text': config.FOOTER_CUSTOM_TEXT,
         }
         
-        html_content = template.render(context)
+        html_content = render_template(template, context)
         write_html_file(output_path, html_content)
         print("Generated: tags/index.html")
     except Exception as e:
@@ -361,6 +379,7 @@ def generate_tags_list_html(tag_map: Dict[str, List[Dict[str, Any]]], build_time
 def generate_feed_html(sorted_posts: List[Dict[str, Any]], build_time_info: str):
     """生成 RSS 订阅说明页 (feed/index.html)"""
     try:
+        i18n = get_i18n()
         output_dir = os.path.join(config.BUILD_DIR, 'feed')
         os.makedirs(output_dir, exist_ok=True)
         output_path = os.path.join(output_dir, 'index.html')
@@ -372,17 +391,17 @@ def generate_feed_html(sorted_posts: List[Dict[str, Any]], build_time_info: str)
 
         feed_html = f"""
         <div class="feed-page">
-            <h1>订阅 Feed</h1>
-            <p class="feed-intro">使用 RSS 阅读器订阅本站，第一时间接收新文章。本站保持静态输出，不需要账号，也不需要 JavaScript。</p>
+            <h1>{i18n['page_feed']}</h1>
+            <p class="feed-intro">{i18n['feed_intro']}</p>
 
             <div class="feed-card">
-                <p class="feed-label">RSS 地址</p>
+                <p class="feed-label">{i18n['feed_url_label']}</p>
                 <p><a href="{rss_path}" class="feed-url">{rss_url}</a></p>
             </div>
         """
 
         if recent_posts:
-            feed_html += "<h2>最近文章</h2>\n<ul class=\"feed-preview-list\">\n"
+            feed_html += f"<h2>{i18n['recent_posts']}</h2>\n<ul class=\"feed-preview-list\">\n"
             for post in recent_posts:
                 link = make_internal_url(post['link'])
                 title = html.escape(post['title'])
@@ -395,16 +414,16 @@ def generate_feed_html(sorted_posts: List[Dict[str, Any]], build_time_info: str)
                 """
             feed_html += "</ul>\n"
         else:
-            feed_html += "<p class=\"empty-state\">暂无文章。</p>\n"
+            feed_html += f"<p class=\"empty-state\">{i18n['no_posts']}</p>\n"
 
         feed_html += "</div>"
 
         template = env.get_template('base.html')
         context = {
             'page_id': 'feed',
-            'page_title': "订阅 Feed",
+            'page_title': i18n['page_feed'],
             'blog_title': config.BLOG_TITLE,
-            'blog_description': 'RSS 订阅说明',
+            'blog_description': i18n['feed_description'],
             'blog_author': config.BLOG_AUTHOR,
             'content_html': feed_html,
             'site_root': get_site_root_prefix(),
@@ -416,7 +435,7 @@ def generate_feed_html(sorted_posts: List[Dict[str, Any]], build_time_info: str)
             'footer_custom_text': config.FOOTER_CUSTOM_TEXT,
         }
 
-        html_content = template.render(context)
+        html_content = render_template(template, context)
         write_html_file(output_path, html_content)
         print("Generated: feed/index.html")
     except Exception as e:
@@ -426,6 +445,7 @@ def generate_feed_html(sorted_posts: List[Dict[str, Any]], build_time_info: str)
 def generate_tag_page(tag_name: str, sorted_tag_posts: List[Dict[str, Any]], build_time_info: str):
     """生成单个标签页面"""
     try:
+        i18n = get_i18n()
         tag_slug = tag_to_slug(tag_name)
         output_dir = os.path.join(config.BUILD_DIR, config.TAGS_DIR_NAME, tag_slug)
         os.makedirs(output_dir, exist_ok=True)
@@ -436,7 +456,7 @@ def generate_tag_page(tag_name: str, sorted_tag_posts: List[Dict[str, Any]], bui
         
         context = {
             'page_id': 'tag',
-            'page_title': f"标签: {tag_name}",
+            'page_title': f"{i18n['page_tag_prefix']}: {tag_name}",
             'blog_title': config.BLOG_TITLE,
             'blog_description': config.BLOG_DESCRIPTION,
             'blog_author': config.BLOG_AUTHOR,
@@ -451,7 +471,7 @@ def generate_tag_page(tag_name: str, sorted_tag_posts: List[Dict[str, Any]], bui
             'footer_custom_text': config.FOOTER_CUSTOM_TEXT,
         }
         
-        html_content = template.render(context)
+        html_content = render_template(template, context)
         write_html_file(output_path, html_content)
         print(f"Generated tag page: {tag_name}")
     except Exception as e:
@@ -545,7 +565,7 @@ def generate_page_html(content_html: str, page_title: str, page_id: str, canonic
             'json_ld_schema': None, 
         }
         
-        html_content = template.render(context)
+        html_content = render_template(template, context)
         write_html_file(output_path, html_content)
         print(f"Generated: {output_path} (Page ID: {page_id})")
 
@@ -664,7 +684,7 @@ def generate_post_page(post: Dict[str, Any]):
             'copyright_config': config.COPYRIGHT_LICENSE,
         }
 
-        html_content = template.render(context)
+        html_content = render_template(template, context)
         write_html_file(output_path, html_content)
         print(f"Generated: {output_path}")
 

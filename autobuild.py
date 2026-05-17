@@ -353,6 +353,7 @@ def build_site():
         'parser.py', 
         'generator.py', 
         'config.py',
+        'i18n.py',
         # 重要的模板文件
         os.path.join('templates', 'post.html'),
         os.path.join('templates', 'list.html'),

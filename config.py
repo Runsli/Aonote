@@ -34,6 +34,9 @@ BLOG_DESCRIPTION = "专注于数据科学、极简主义与纯粹的 Web 技术�
 # 作者，主要作用于网站页脚的位置进行显示
 BLOG_AUTHOR = "PureMo-Blog"
 
+# 站点界面语言。可选值参考 i18n.py，例如 "zh-CN" 或 "en"。
+SITE_LANGUAGE = "zh-CN"
+
 # 存储 CSS 文件的哈希名
 CSS_FILENAME = 'style.css' 
 
