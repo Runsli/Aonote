@@ -74,7 +74,7 @@
     --color-border-dark: #2a2a2a;
 
     --color-code-bg: #f8f9fa;
-    --color-code-bg-dark: #2c2c2c;
+    --color-code-bg-dark: #22272e;
     --color-admonition-note: #00796b;
     --color-admonition-warn: #fbc02d;
     --color-admonition-danger: #d32f2f;
@@ -834,8 +834,8 @@ main {
     display: block;
     margin: 0 -15px;
     padding: 0 15px;
-    background-color: rgba(0, 0, 0, 0.035);
-    box-shadow: inset 3px 0 0 rgba(0, 121, 107, 0.42);
+    background-color: rgba(9, 105, 218, 0.08);
+    box-shadow: inset 3px 0 0 rgba(9, 105, 218, 0.42);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -844,8 +844,8 @@ main {
     }
 
     .post-content .highlight .hll {
-        background-color: rgba(255, 255, 255, 0.045);
-        box-shadow: inset 3px 0 0 rgba(128, 203, 196, 0.48);
+        background-color: rgba(108, 182, 255, 0.12);
+        box-shadow: inset 3px 0 0 rgba(108, 182, 255, 0.52);
     }
 }
 
@@ -909,15 +909,15 @@ main {
     .post-content .highlight[data-lang] {
         background-image: linear-gradient(
             to bottom,
-            rgba(255, 255, 255, 0.045) 0,
-            rgba(255, 255, 255, 0.045) 32px,
+            rgba(205, 217, 229, 0.055) 0,
+            rgba(205, 217, 229, 0.055) 32px,
             transparent 32px
         );
     }
 
     .post-content .highlight::before,
     .post-content .highlight::after {
-        color: #b8c1cc;
+        color: #adbac7;
         opacity: 1;
     }
 
@@ -2433,11 +2433,11 @@ button:focus,
    Z1. Pygments 代码高亮颜色
    ========================================= */
 .highlight {
-    color: #263238;
+    color: #24292f;
 }
 
 .highlight .hll {
-    background-color: rgba(0, 121, 107, 0.075);
+    background-color: rgba(9, 105, 218, 0.08);
 }
 
 .highlight .c,
@@ -2446,7 +2446,7 @@ button:focus,
 .highlight .cs,
 .highlight .go,
 .highlight .gp {
-    color: #78909c;
+    color: #57606a;
     font-style: italic;
 }
 
@@ -2457,7 +2457,7 @@ button:focus,
 .highlight .kp,
 .highlight .kr,
 .highlight .ow {
-    color: #00796b;
+    color: #cf222e;
     font-weight: 650;
 }
 
@@ -2466,7 +2466,7 @@ button:focus,
 .highlight .ne,
 .highlight .nn,
 .highlight .nt {
-    color: #00695c;
+    color: #8250df;
     font-weight: 650;
 }
 
@@ -2481,7 +2481,7 @@ button:focus,
 .highlight .sr,
 .highlight .ss,
 .highlight .sx {
-    color: #7a6f2b;
+    color: #0a3069;
 }
 
 .highlight .m,
@@ -2490,12 +2490,11 @@ button:focus,
 .highlight .mi,
 .highlight .mo,
 .highlight .il {
-    color: #5e6ad2;
+    color: #0550ae;
 }
 
 .highlight .na,
 .highlight .nb,
-.highlight .nf,
 .highlight .bp,
 .highlight .no,
 .highlight .nd,
@@ -2503,18 +2502,22 @@ button:focus,
 .highlight .vc,
 .highlight .vg,
 .highlight .vi {
-    color: #455a64;
+    color: #953800;
+}
+
+.highlight .nf {
+    color: #8250df;
 }
 
 .highlight .o,
 .highlight .p {
-    color: #607d8b;
+    color: #57606a;
 }
 
 .highlight .cp,
 .highlight .gh,
 .highlight .gu {
-    color: #546e7a;
+    color: #57606a;
     font-weight: 650;
 }
 
@@ -2530,11 +2533,11 @@ button:focus,
 .highlight .gr,
 .highlight .gt,
 .highlight .gd {
-    color: #b00020;
+    color: #82071e;
 }
 
 .highlight .gi {
-    color: #2e7d32;
+    color: #116329;
 }
 
 .highlight .w {
@@ -2543,7 +2546,7 @@ button:focus,
 
 @media (prefers-color-scheme: dark) {
     .highlight {
-        color: #e6edf3 !important;
+        color: #adbac7 !important;
         background: transparent !important;
     }
 
@@ -2553,7 +2556,7 @@ button:focus,
     }
 
     .highlight .hll {
-        background-color: rgba(255, 255, 255, 0.045);
+        background-color: rgba(108, 182, 255, 0.12);
     }
 
     .highlight .c,
@@ -2562,7 +2565,7 @@ button:focus,
     .highlight .cs,
     .highlight .go,
     .highlight .gp {
-        color: #9aa4ad;
+        color: #8b949e;
     }
 
     .highlight .k,
@@ -2574,7 +2577,7 @@ button:focus,
     .highlight .ow,
     .highlight .kt,
     .highlight .nt {
-        color: #c792ea;
+        color: #f47067;
     }
 
     .highlight .s,
@@ -2588,7 +2591,7 @@ button:focus,
     .highlight .sr,
     .highlight .ss,
     .highlight .sx {
-        color: #c3e88d;
+        color: #96d0ff;
     }
 
     .highlight .m,
@@ -2597,12 +2600,11 @@ button:focus,
     .highlight .mi,
     .highlight .mo,
     .highlight .il {
-        color: #f78c6c;
+        color: #6cb6ff;
     }
 
     .highlight .na,
     .highlight .nb,
-    .highlight .nf,
     .highlight .bp,
     .highlight .no,
     .highlight .nd,
@@ -2610,36 +2612,40 @@ button:focus,
     .highlight .vc,
     .highlight .vg,
     .highlight .vi {
-        color: #82aaff;
+        color: #f69d50;
+    }
+
+    .highlight .nf {
+        color: #dcbdfb;
     }
 
     .highlight .nc,
     .highlight .ne,
     .highlight .nn {
-        color: #ffcb6b;
+        color: #dcbdfb;
         font-weight: 650;
     }
 
     .highlight .o,
     .highlight .p {
-        color: #c9d1d9;
+        color: #adbac7;
     }
 
     .highlight .cp,
     .highlight .gh,
     .highlight .gu {
-        color: #c9d1d9;
+        color: #adbac7;
     }
 
     .highlight .err,
     .highlight .gr,
     .highlight .gt,
     .highlight .gd {
-        color: #ff6b6b;
+        color: #ff938a;
     }
 
     .highlight .gi {
-        color: #a5d6a7;
+        color: #8ddb8c;
     }
 }
 
