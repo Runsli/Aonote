@@ -304,6 +304,8 @@ def _normalize_language_label(language: str) -> str:
         'yml': 'YAML',
         'md': 'MD',
         'markdown': 'MD',
+        'diff': 'DIFF',
+        'patch': 'DIFF',
         'sql': 'SQL',
         'txt': 'TEXT',
         'text': 'TEXT',
@@ -412,7 +414,7 @@ def _guess_language_label(code: str) -> Optional[str]:
     label = _normalize_language_label(alias)
     common_labels = {
         'PYTHON', 'JS', 'TS', 'SHELL', 'HTML', 'XML', 'CSS', 'SCSS',
-        'JSON', 'YAML', 'MD', 'SQL',
+        'JSON', 'YAML', 'MD', 'DIFF', 'SQL',
     }
     return label if label in common_labels else None
 
