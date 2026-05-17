@@ -1542,6 +1542,10 @@ main {
     opacity: 0.9;
 }
 
+.read-more-link-area {
+    margin-top: var(--space-xl);
+}
+
 @media (prefers-color-scheme: dark) {
 
     .post-list-item:hover,
