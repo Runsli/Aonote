@@ -62,6 +62,45 @@ def _build_table_caption(soup: BeautifulSoup, caption_text: str, i18n: Dict[str,
     return caption_tag
 
 
+def _footnote_number_from_link(link) -> str:
+    text = link.get_text(" ", strip=True)
+    if text:
+        return text.strip("[]")
+    href = link.get('href', '')
+    match = re.search(r'(?:fn|fnref):([^#]+)$', href)
+    return match.group(1) if match else ''
+
+
+def _footnote_number_from_backref(soup: BeautifulSoup, backref) -> str:
+    href = backref.get('href', '')
+    if not href.startswith('#'):
+        return _footnote_number_from_link(backref)
+
+    target = soup.find(id=href[1:])
+    if target:
+        ref_link = target.find('a', class_='footnote-ref')
+        if ref_link:
+            return _footnote_number_from_link(ref_link)
+    return _footnote_number_from_link(backref)
+
+
+def _add_footnote_semantics(soup: BeautifulSoup, i18n: Dict[str, Any]) -> None:
+    ref_template = i18n.get('footnote_ref_label', 'Footnote {number}')
+    backref_template = i18n.get('footnote_backref_label', 'Back to footnote {number} reference')
+
+    for ref_link in soup.select('a.footnote-ref'):
+        number = _footnote_number_from_link(ref_link)
+        label = ref_template.format(number=number)
+        ref_link['aria-label'] = label
+        ref_link['title'] = label
+
+    for backref in soup.select('a.footnote-backref'):
+        number = _footnote_number_from_backref(soup, backref)
+        label = backref_template.format(number=number)
+        backref['aria-label'] = label
+        backref['title'] = label
+
+
 def _read_image_dimensions(image_path: str) -> Optional[Tuple[int, int]]:
     """用标准库读取常见图片尺寸，避免为懒加载图片引入布局偏移。"""
     try:
@@ -629,10 +668,12 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
     # [重构] UI 增强：图片懒加载 (Lazy Load) 和表格包裹器
     # -------------------------------------------------------------------------
     # 使用 BeautifulSoup 来进行安全、可靠的 HTML 变换
-    if '<img' in content_html or '<table' in content_html or '<pre' in content_html or 'arithmatex' in content_html:
+    if '<img' in content_html or '<table' in content_html or '<pre' in content_html or 'arithmatex' in content_html or 'footnote' in content_html:
         soup = BeautifulSoup(content_html, 'html.parser')
+        i18n = _get_i18n()
 
         _render_mathml(soup)
+        _add_footnote_semantics(soup, i18n)
 
         # 1. 图片懒加载 (Lazy Load)
         for img in soup.find_all('img'):
@@ -649,8 +690,6 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
                         width, height = dimensions
                         img.setdefault('width', str(width))
                         img.setdefault('height', str(height))
-
-        i18n = _get_i18n()
 
         # 2. 表格包裹器 (Table Wrapper)
         for table in soup.find_all('table'):

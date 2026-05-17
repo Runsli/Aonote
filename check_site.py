@@ -203,6 +203,17 @@ def _check_accessibility(html: str, page_label: str) -> Tuple[List[str], List[st
             if not wrapper.get("aria-label", "").strip():
                 warnings.append(f"{page_label}: table wrapper missing aria-label")
 
+    for footnote_ref in soup.select("a.footnote-ref"):
+        if not footnote_ref.get("aria-label", "").strip():
+            warnings.append(f"{page_label}: footnote reference missing aria-label")
+
+    for footnote_backref in soup.select("a.footnote-backref"):
+        if not footnote_backref.get("aria-label", "").strip():
+            warnings.append(f"{page_label}: footnote back reference missing aria-label")
+        title = footnote_backref.get("title", "").strip()
+        if title and "Jump back" in title:
+            warnings.append(f"{page_label}: footnote back reference title is not localized")
+
     for element in soup.find_all(attrs={"aria-label": True}):
         if not element.get("aria-label", "").strip():
             errors.append(f"{page_label}: empty aria-label on <{element.name}>")
