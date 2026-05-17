@@ -98,6 +98,12 @@ PureMo-Blog/
 python check_site.py
 ```
 
+需要人工走查键盘顺序时，可以额外输出每个页面的可聚焦元素顺序：
+
+```bash
+python check_site.py --focus-report
+```
+
 ## 写一篇文章
 
 在 `markdown/` 目录中新建 `.md` 文件，例如 `markdown/04.md`：

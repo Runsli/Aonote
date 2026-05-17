@@ -1,9 +1,10 @@
 import posixpath
-import sys
 import xml.etree.ElementTree as ET
+from argparse import ArgumentParser
+from collections import defaultdict
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import DefaultDict, Dict, List, Optional, Set, Tuple
 from urllib.parse import urlparse
 
 import config
@@ -12,6 +13,7 @@ from bs4 import BeautifulSoup
 
 ERROR_PREFIX = "ERROR"
 WARNING_PREFIX = "WARN"
+CHECK_CATEGORIES = ("A11Y", "SEO", "Links", "Assets", "Feeds", "No-JS", "Build")
 GENERIC_LINK_TEXT = {
     "click here",
     "here",
@@ -135,6 +137,52 @@ def _is_complex_table(table) -> bool:
     first_row = rows[0] if rows else None
     column_count = len(first_row.find_all(["th", "td"])) if first_row else 0
     return column_count >= 4 or len(rows) >= 5
+
+
+def _category_for_message(message: str) -> str:
+    lower = message.lower()
+    if any(term in lower for term in ("rss", "atom", "sitemap", "xml", "feed")):
+        return "Feeds"
+    if any(term in lower for term in ("link", "anchor", "href", "javascript:")):
+        return "Links"
+    if any(term in lower for term in ("image", "asset", "stylesheet", "source")):
+        return "Assets"
+    if any(term in lower for term in ("title", "description", "canonical", "robots", "noindex", "404")):
+        return "SEO"
+    if any(term in lower for term in ("script", "no-js")):
+        return "No-JS"
+    if any(term in lower for term in ("build directory", "html files", "required file")):
+        return "Build"
+    return "A11Y"
+
+
+def _group_messages(messages: List[str]) -> DefaultDict[str, List[str]]:
+    grouped: DefaultDict[str, List[str]] = defaultdict(list)
+    for message in messages:
+        grouped[_category_for_message(message)].append(message)
+    return grouped
+
+
+def _print_grouped_messages(prefix: str, messages: List[str]) -> None:
+    grouped = _group_messages(messages)
+    for category in CHECK_CATEGORIES:
+        category_messages = grouped.get(category, [])
+        if not category_messages:
+            continue
+        print(f"{prefix}: [{category}] {len(category_messages)} issue(s)")
+        for message in category_messages:
+            print(f"  - {message}")
+
+
+def _print_category_summary(errors: List[str], warnings: List[str]) -> None:
+    error_groups = _group_messages(errors)
+    warning_groups = _group_messages(warnings)
+    print("Health check categories:")
+    for category in CHECK_CATEGORIES:
+        error_count = len(error_groups.get(category, []))
+        warning_count = len(warning_groups.get(category, []))
+        status = "ok" if error_count == 0 and warning_count == 0 else f"{error_count} error(s), {warning_count} warning(s)"
+        print(f"  - {category}: {status}")
 
 
 def _check_accessibility(html: str, page_label: str) -> Tuple[List[str], List[str]]:
@@ -339,7 +387,54 @@ def _check_xml_file(root: Path, filename: str, expected_root_suffix: str) -> Lis
     return []
 
 
-def run_checks(build_dir: str = config.BUILD_DIR) -> bool:
+def _is_focusable(element) -> bool:
+    if element.has_attr("disabled"):
+        return False
+    tabindex = element.get("tabindex")
+    if tabindex is not None:
+        return tabindex.strip() != "-1"
+    if element.name == "a":
+        return element.has_attr("href")
+    if element.name in {"button", "summary", "textarea", "select"}:
+        return True
+    if element.name == "input":
+        return not element.has_attr("disabled") and element.get("type", "").lower() != "hidden"
+    return False
+
+
+def _element_accessible_name(element) -> str:
+    aria_label = element.get("aria-label", "").strip()
+    if aria_label:
+        return aria_label
+    title = element.get("title", "").strip()
+    text = _visible_text(BeautifulSoup(str(element), "html.parser"))
+    return text or title or "(no accessible name)"
+
+
+def _focusable_description(element) -> str:
+    classes = element.get("class", [])
+    class_suffix = f".{'.'.join(classes)}" if classes else ""
+    role = element.get("role", "")
+    role_suffix = f"[role={role}]" if role else ""
+    href = element.get("href", "")
+    href_suffix = f" -> {href}" if href else ""
+    name = _element_accessible_name(element)
+    return f"{element.name}{class_suffix}{role_suffix} -> {name}{href_suffix}"
+
+
+def _print_focus_report(root: Path, html_files: List[Path]) -> None:
+    print("\nFocus order report:")
+    for html_path in html_files:
+        html = html_path.read_text(encoding="utf-8", errors="replace")
+        soup = BeautifulSoup(html, "html.parser")
+        focusable = [element for element in soup.find_all(True) if _is_focusable(element)]
+        page_label = html_path.relative_to(root).as_posix()
+        print(f"\n{page_label} ({len(focusable)} focusable item(s))")
+        for index, element in enumerate(focusable, 1):
+            print(f"  {index}. {_focusable_description(element)}")
+
+
+def run_checks(build_dir: str = config.BUILD_DIR, focus_report: bool = False) -> bool:
     root = Path(build_dir)
     errors: List[str] = []
     warnings: List[str] = []
@@ -365,10 +460,12 @@ def run_checks(build_dir: str = config.BUILD_DIR) -> bool:
     errors.extend(_check_xml_file(root, config.RSS_FILE, "rss"))
     errors.extend(_check_xml_file(root, config.ATOM_FILE, "feed"))
 
-    for warning in warnings:
-        print(f"{WARNING_PREFIX}: {warning}")
-    for error in errors:
-        print(f"{ERROR_PREFIX}: {error}")
+    _print_category_summary(errors, warnings)
+    _print_grouped_messages(WARNING_PREFIX, warnings)
+    _print_grouped_messages(ERROR_PREFIX, errors)
+
+    if focus_report:
+        _print_focus_report(root, html_files)
 
     if errors:
         print(f"Site health check failed: {len(errors)} error(s), {len(warnings)} warning(s).")
@@ -379,5 +476,8 @@ def run_checks(build_dir: str = config.BUILD_DIR) -> bool:
 
 
 if __name__ == "__main__":
-    target_dir = sys.argv[1] if len(sys.argv) > 1 else config.BUILD_DIR
-    raise SystemExit(0 if run_checks(target_dir) else 1)
+    arg_parser = ArgumentParser(description="Run post-build checks for the generated static site.")
+    arg_parser.add_argument("build_dir", nargs="?", default=config.BUILD_DIR, help="Build directory to inspect.")
+    arg_parser.add_argument("--focus-report", action="store_true", help="Print focusable elements in DOM order for manual keyboard review.")
+    args = arg_parser.parse_args()
+    raise SystemExit(0 if run_checks(args.build_dir, focus_report=args.focus_report) else 1)
