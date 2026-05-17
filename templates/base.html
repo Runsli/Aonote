@@ -38,12 +38,24 @@
     <header>
         <div class="header-inner">
             <a href="{{site_root}}/" class="site-title">{{blog_title}}</a>
-            <nav aria-label="{{i18n.main_navigation}}">
+            <nav class="desktop-nav" aria-label="{{i18n.main_navigation}}">
                 <a href="{{site_root}}/" {% if page_id=='index' %}aria-current="page" {% endif %}>{{i18n.nav_home}}</a>
                 <a href="{{site_root}}/archive/" {% if page_id=='archive' %}aria-current="page" {% endif %}>{{i18n.nav_archive}}</a>
                 <a href="{{site_root}}/tags/" {% if page_id=='tags' %}aria-current="page" {% endif %}>{{i18n.nav_tags}}</a>
                 <a href="{{site_root}}/about/" {% if page_id=='about' %}aria-current="page" {% endif %}>{{i18n.nav_about}}</a>
             </nav>
+            <details class="mobile-nav-menu">
+                <summary aria-label="{{i18n.nav_menu}}">
+                    <span class="visually-hidden">{{i18n.nav_menu}}</span>
+                    <span class="hamburger-icon" aria-hidden="true"></span>
+                </summary>
+                <nav class="mobile-nav-links" aria-label="{{i18n.main_navigation}}">
+                    <a href="{{site_root}}/" {% if page_id=='index' %}aria-current="page" {% endif %}>{{i18n.nav_home}}</a>
+                    <a href="{{site_root}}/archive/" {% if page_id=='archive' %}aria-current="page" {% endif %}>{{i18n.nav_archive}}</a>
+                    <a href="{{site_root}}/tags/" {% if page_id=='tags' %}aria-current="page" {% endif %}>{{i18n.nav_tags}}</a>
+                    <a href="{{site_root}}/about/" {% if page_id=='about' %}aria-current="page" {% endif %}>{{i18n.nav_about}}</a>
+                </nav>
+            </details>
         </div>
     </header>
 
