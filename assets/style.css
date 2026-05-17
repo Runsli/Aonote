@@ -1036,6 +1036,12 @@ main {
     box-shadow: 0 0 0 2px var(--color-primary-light);
 }
 
+.table-wrapper:focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
+    box-shadow: var(--focus-ring-shadow);
+}
+
 @media (prefers-color-scheme: dark) {
     .table-wrapper:hover {
         background-color: rgba(255, 255, 255, 0.02);
@@ -1053,6 +1059,29 @@ main {
     color: var(--color-main-text);
     border-radius: var(--radius-sm);
     overflow: hidden;
+}
+
+.post-content caption {
+    caption-side: top;
+    padding: var(--space-sm) var(--space-md) calc(var(--space-sm) + 2px);
+    color: var(--color-main-subtext);
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: left;
+    border-bottom: 1px solid var(--color-main-border);
+}
+
+.table-caption-prefix {
+    color: var(--color-primary);
+    font-weight: 700;
+    margin-right: 0.15em;
+}
+
+@media (prefers-color-scheme: dark) {
+    .table-caption-prefix {
+        color: var(--color-link-dark);
+    }
 }
 
 .post-content th,

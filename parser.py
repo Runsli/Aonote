@@ -9,7 +9,7 @@ from datetime import datetime, date
 from typing import Dict, Any, Tuple, Optional, List
 import config 
 import unicodedata 
-from bs4 import BeautifulSoup # 引入 BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString # 引入 BeautifulSoup
 from i18n import get_translations
 from latex2mathml.converter import convert as convert_latex_to_mathml
 
@@ -33,6 +33,33 @@ def _add_diff_line_semantics(soup: BeautifulSoup, pre, i18n: Dict[str, Any]) -> 
         _prepend_hidden_label(soup, added_line, added_label)
     for removed_line in pre.select('.gd'):
         _prepend_hidden_label(soup, removed_line, removed_label)
+
+
+def _extract_table_caption(table) -> Optional[str]:
+    sibling = table.previous_sibling
+    while isinstance(sibling, NavigableString) and not sibling.strip():
+        sibling = sibling.previous_sibling
+
+    if not sibling or getattr(sibling, 'name', None) != 'p':
+        return None
+
+    text = sibling.get_text(" ", strip=True)
+    for prefix in ('表格：', '表：', 'Table: ', 'Table：', 'Caption: ', 'Caption：'):
+        if text.startswith(prefix):
+            caption = text[len(prefix):].strip()
+            if caption:
+                sibling.decompose()
+                return caption
+    return None
+
+
+def _build_table_caption(soup: BeautifulSoup, caption_text: str, i18n: Dict[str, Any]):
+    caption_tag = soup.new_tag('caption')
+    prefix = soup.new_tag('span', attrs={'class': 'table-caption-prefix', 'aria-hidden': 'true'})
+    prefix.string = i18n.get('table_caption_prefix', 'Table: ')
+    caption_tag.append(prefix)
+    caption_tag.append(caption_text)
+    return caption_tag
 
 
 def _read_image_dimensions(image_path: str) -> Optional[Tuple[int, int]]:
@@ -623,8 +650,14 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
                         img.setdefault('width', str(width))
                         img.setdefault('height', str(height))
 
+        i18n = _get_i18n()
+
         # 2. 表格包裹器 (Table Wrapper)
         for table in soup.find_all('table'):
+            caption_text = _extract_table_caption(table)
+            if caption_text and not table.find('caption'):
+                table.insert(0, _build_table_caption(soup, caption_text, i18n))
+
             # 将 Markdown 表格对齐生成的 inline style 转成 class，便于 CSP 去掉 unsafe-inline。
             for cell in table.find_all(['th', 'td']):
                 style = cell.get('style', '')
@@ -646,8 +679,22 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
             if 'class' in parent.attrs and 'table-wrapper' in parent['class']:
                 continue
 
-            # 创建新的 div 容器
-            wrapper_div = soup.new_tag('div', attrs={'class': 'table-wrapper'})
+            caption = table.find('caption')
+            caption_label = caption_text or (caption.get_text(" ", strip=True) if caption else "")
+            wrapper_label = (
+                i18n.get('table_scroll_region_label', 'Horizontally scrollable table: {caption}').format(caption=caption_label)
+                if caption
+                else i18n.get('table_scroll_region_fallback_label', 'Horizontally scrollable table')
+            )
+            wrapper_div = soup.new_tag(
+                'div',
+                attrs={
+                    'class': 'table-wrapper',
+                    'role': 'region',
+                    'tabindex': '0',
+                    'aria-label': wrapper_label,
+                },
+            )
             
             # 将 table 替换为 wrapper_div
             table.replace_with(wrapper_div)
@@ -656,7 +703,6 @@ def get_metadata_and_content(md_file_path: str) -> Tuple[Dict[str, Any], str, st
             wrapper_div.append(table)
 
         # 3. 代码块语言标签
-        i18n = _get_i18n()
         for pre in soup.find_all('pre'):
             language_label, code_title = _detect_code_block_metadata(pre, fenced_code_blocks)
             pre['tabindex'] = '0'

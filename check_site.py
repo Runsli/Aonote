@@ -130,6 +130,13 @@ def _visible_text(element) -> str:
     return " ".join(element.get_text(" ", strip=True).split())
 
 
+def _is_complex_table(table) -> bool:
+    rows = table.find_all("tr")
+    first_row = rows[0] if rows else None
+    column_count = len(first_row.find_all(["th", "td"])) if first_row else 0
+    return column_count >= 4 or len(rows) >= 5
+
+
 def _check_accessibility(html: str, page_label: str) -> Tuple[List[str], List[str]]:
     errors: List[str] = []
     warnings: List[str] = []
@@ -183,6 +190,18 @@ def _check_accessibility(html: str, page_label: str) -> Tuple[List[str], List[st
         for removed_line in diff_block.select(".gd"):
             if not removed_line.select_one(".diff-line-label"):
                 warnings.append(f"{page_label}: diff removed line missing screen-reader label")
+
+    for table in soup.find_all("table"):
+        if not table.find("caption") and _is_complex_table(table):
+            warnings.append(f"{page_label}: complex table missing caption")
+        wrapper = table.find_parent(class_="table-wrapper")
+        if not wrapper:
+            warnings.append(f"{page_label}: table missing scroll wrapper")
+        else:
+            if wrapper.get("tabindex") != "0":
+                warnings.append(f"{page_label}: table wrapper is not keyboard-scrollable")
+            if not wrapper.get("aria-label", "").strip():
+                warnings.append(f"{page_label}: table wrapper missing aria-label")
 
     for element in soup.find_all(attrs={"aria-label": True}):
         if not element.get("aria-label", "").strip():
