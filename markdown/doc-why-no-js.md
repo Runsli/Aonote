@@ -46,6 +46,10 @@ Aonote 把代码高亮、公式（MathML）、目录锚点、Open Graph 等放�
 
 no-JS 指的是 **你的读者不必为你的内容站加载脚本**。构建工具本身用 Python，与浏览器无关。若你将来需要个别页面的例外，应在明确约束下审慎添加，并仍通过健康检查把关。
 
+## 若仍需要 JavaScript
+
+no-JS 是本仓库（Python 版）的默认约束，不是否定一切前端能力。若你的站点需要 Astro 组件、客户端增强或更复杂的交互，可使用同系列的 [astro-theme-aonote](https://github.com/runsli/astro-theme-aonote)——在尽量保留 Aonote 阅读体验的前提下，基于 Astro 5 构建，并可按需引入 JS。详见 [关于页 · 相关项目](/about/)。
+
 ## 相关阅读
 
 - [快速开始](/posts/doc-quickstart/)

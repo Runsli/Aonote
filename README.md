@@ -6,6 +6,10 @@ Aonote is a minimal static blog generator written in Python. It turns Markdown f
 
 **Official site (live demo):** [aonote.vercel.app](https://aonote.vercel.app) · by [Runsli](https://www.runsli.com/)
 
+### Related project
+
+Use this repo for **no-JS, Python-based** builds. For the **same reading experience with Astro 5 and optional client JS**, see [astro-theme-aonote](https://github.com/runsli/astro-theme-aonote) ([live demo](https://astro-theme-aonote.vercel.app)). Both share the same content model and visual design.
+
 ## Features
 
 Aonote is built for document-style sites and personal blogs: readable content, clear structure, easy deployment, and a good reading experience without client-side JavaScript.
