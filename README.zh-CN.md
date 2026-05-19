@@ -8,7 +8,7 @@ Aonote 青笺是一个用 Python 编写的极简静态博客生成器。它把 `
 
 ### 相关项目
 
-需要 **no-JS、Python 构建** 时用本仓库；需要 **同款 UI、Astro 生态、可选 JS** 时用 [astro-theme-aonote](https://github.com/runsli/astro-theme-aonote)（[演示站](https://astro-theme-aonote.vercel.app)）。二者内容模型与样式对齐，可视为同一品牌的两种实现。
+需要 **no-JS、Python 构建** 时用本仓库；需要 **同款 UI、Astro 生态、可选 JS** 时用 [astro-theme-aonote](https://github.com/runsli/astro-theme-aonote)（[演示站](https://astro-theme-aonote.vercel.app)）。二者内容模型与样式对齐。完整对照见官网 [项目生态](https://aonote.vercel.app/posts/doc-ecosystem/)（`markdown/doc-ecosystem.md`）。
 
 ## 预览
 
@@ -142,6 +142,7 @@ python -m http.server 8000
    - `markdown/doc-quickstart.md`
    - `markdown/doc-why-no-js.md`
    - `markdown/doc-changelog.md`
+   - `markdown/doc-ecosystem.md`
 5. **删除** 不需要的示例（可选）：
    - `markdown/markdown-basics.md`
 6. 运行 `python autobuild.py`，部署 `_site/`。
@@ -160,6 +161,7 @@ Aonote/
 │   ├── doc-quickstart.md      # 项目文档（Fork 后可删）
 │   ├── doc-why-no-js.md
 │   ├── doc-changelog.md
+│   ├── doc-ecosystem.md
 │   ├── markdown-basics.md     # 排版示例（可选保留）
 │   ├── 404.md
 │   └── about.md

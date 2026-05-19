@@ -45,6 +45,7 @@ cd _site && python -m http.server 8000
 ## 链接
 
 - **源码与 Issue**：[github.com/Runsli/Aonote](https://github.com/Runsli/Aonote)
+- **项目生态**（Aonote / Astro 主题 / 个人站）：[doc-ecosystem](/posts/doc-ecosystem/)
 - **Astro 主题（可选 JS）**：[astro-theme-aonote](https://github.com/runsli/astro-theme-aonote) · [在线演示](https://astro-theme-aonote.vercel.app)
 - **作者**：[Runsli 的小站](https://www.runsli.com/)
 - **关于本项目**：[关于页](/about/)

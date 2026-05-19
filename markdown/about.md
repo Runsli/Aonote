@@ -26,17 +26,9 @@ Aonote 青笺是一个面向个人博客、技术笔记与轻量文档站的 **n
 
 欢迎通过 GitHub Issue 反馈问题或提交 Pull Request。
 
-## 相关项目：Astro 主题
+## 项目生态
 
-若你需要在**保持 Aonote 阅读体验与内容模型**的前提下，用客户端 JavaScript 实现更复杂的交互（例如组件化 UI、渐进增强、与 Astro 生态集成），可以使用同系列的 **[astro-theme-aonote](https://github.com/runsli/astro-theme-aonote)**：
-
-| | [Aonote 青笺](https://github.com/Runsli/Aonote)（本仓库） | [astro-theme-aonote](https://github.com/runsli/astro-theme-aonote) |
-| --- | --- | --- |
-| 技术栈 | Python 构建，纯 HTML/CSS | Astro 5，可按需加 JS |
-| 定位 | no-JS 文档站、极简部署、构建期检查 | 同款版式与 Markdown 能力的 Astro 移植 |
-| 演示 | [aonote.vercel.app](https://aonote.vercel.app) | [astro-theme-aonote.vercel.app](https://astro-theme-aonote.vercel.app) |
-
-两个项目**互相独立维护**，样式与信息架构尽量对齐，便于在「极简 no-JS」与「可扩展交互」之间切换，而不是二选一的对立关系。
+Aonote 与同系列的 [astro-theme-aonote](https://github.com/runsli/astro-theme-aonote)、作者个人站 [runsli.com](https://www.runsli.com/) 的关系、选型对照与互链说明，见 **[项目生态](/posts/doc-ecosystem/)**（完整版只维护这一篇）。
 
 ## 许可
 
@@ -48,7 +40,7 @@ Aonote 青笺是一个面向个人博客、技术笔记与轻量文档站的 **n
 
 1. 修改 `config.py` 中的站点信息与 `BASE_URL`。
 2. 替换 `welcome-to-aonote.md` 与 `about.md`。
-3. 删除以 `doc-` 开头的项目文档（若不需要）。
+3. 删除以 `doc-` 开头的项目文档（若不需要，含 `doc-ecosystem.md`）。
 4. 保留或删除 `markdown-basics.md` 等示例文。
 5. 运行 `python autobuild.py` 并部署 `_site/`。
 

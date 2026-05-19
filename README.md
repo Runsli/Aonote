@@ -8,7 +8,7 @@ Aonote is a minimal static blog generator written in Python. It turns Markdown f
 
 ### Related project
 
-Use this repo for **no-JS, Python-based** builds. For the **same reading experience with Astro 5 and optional client JS**, see [astro-theme-aonote](https://github.com/runsli/astro-theme-aonote) ([live demo](https://astro-theme-aonote.vercel.app)). Both share the same content model and visual design.
+Use this repo for **no-JS, Python-based** builds. For the **same reading experience with Astro 5 and optional client JS**, see [astro-theme-aonote](https://github.com/runsli/astro-theme-aonote) ([live demo](https://astro-theme-aonote.vercel.app)). Full comparison: [Ecosystem doc](https://aonote.vercel.app/posts/doc-ecosystem/) (`markdown/doc-ecosystem.md`).
 
 ## Preview
 
@@ -138,7 +138,7 @@ The default `markdown/` content powers the **Aonote official site** (project int
 1. Edit `config.py`: `BASE_URL`, `BLOG_TITLE`, `BLOG_DESCRIPTION`, `BLOG_AUTHOR`.
 2. Replace `markdown/welcome-to-aonote.md` with your own homepage post.
 3. Rewrite `markdown/about.md` (keep `hidden: true`).
-4. Delete project docs if you do not need them: `markdown/doc-quickstart.md`, `markdown/doc-why-no-js.md`, `markdown/doc-changelog.md`.
+4. Delete project docs if you do not need them: `markdown/doc-quickstart.md`, `markdown/doc-why-no-js.md`, `markdown/doc-changelog.md`, `markdown/doc-ecosystem.md`.
 5. Optionally delete `markdown/markdown-basics.md`.
 6. Run `python autobuild.py` and deploy `_site/`.
 
@@ -154,6 +154,7 @@ Aonote/
 │   ├── doc-quickstart.md      # Project docs (optional delete)
 │   ├── doc-why-no-js.md
 │   ├── doc-changelog.md
+│   ├── doc-ecosystem.md
 │   ├── markdown-basics.md     # Syntax preview (optional)
 │   ├── 404.md
 │   └── about.md

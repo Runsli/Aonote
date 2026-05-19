@@ -13,6 +13,7 @@ tags: [文档]
 
 ### 官网
 
+- 新增 [项目生态](/posts/doc-ecosystem/) 文档；about、README 与 Astro 主题、runsli.com 互链。
 - 首页支持通过 `INDEX_PAGE_TITLE` / `INDEX_PAGE_SUBTITLE` 配置浏览器标签与分享标题（不在正文显示）。
 - 页脚显示 GitHub 仓库链接与自定义站点文案。
 - 新增本站更新日志页面。
