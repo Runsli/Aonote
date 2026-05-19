@@ -4,7 +4,7 @@ English | [中文](README.zh-CN.md)
 
 Aonote is a minimal static blog generator written in Python. It turns Markdown files in `markdown/` into pure HTML/CSS pages with no frontend framework and no browser JavaScript required.
 
-**Live demo:** [aonote.vercel.app](https://aonote.vercel.app)
+**Official site (live demo):** [aonote.vercel.app](https://aonote.vercel.app) · by [Runsli](https://www.runsli.com/)
 
 ## Features
 
@@ -25,7 +25,7 @@ Aonote is built for document-style sites and personal blogs: readable content, c
 - Pygments highlighting, language detection, code block titles, line highlights, and horizontal scroll for long lines.
 - `diff` / `patch` blocks with added/removed line styling and screen-reader labels.
 - Table captions via a line like `Table: My caption` before the table (Chinese sites may use `表格：`).
-- Example posts are split by topic: basics, code/media, tables, and no-JS components.
+- The official site includes project docs (`doc-*.md`) and a Markdown rendering preview page.
 
 ### no-JS and interaction
 
@@ -121,6 +121,17 @@ python -m http.server 8000
 
 Open `http://localhost:8000`.
 
+## Customize after forking
+
+The default `markdown/` content powers the **Aonote official site** (project intro, docs, and one syntax preview). To turn a fork into your personal blog:
+
+1. Edit `config.py`: `BASE_URL`, `BLOG_TITLE`, `BLOG_DESCRIPTION`, `BLOG_AUTHOR`.
+2. Replace `markdown/welcome-to-aonote.md` with your own homepage post.
+3. Rewrite `markdown/about.md` (keep `hidden: true`).
+4. Delete project docs if you do not need them: `markdown/doc-quickstart.md`, `markdown/doc-why-no-js.md`.
+5. Optionally delete `markdown/markdown-basics.md`.
+6. Run `python autobuild.py` and deploy `_site/`.
+
 ## Project layout
 
 ```text
@@ -129,12 +140,10 @@ Aonote/
 │   └── style.css              # Site styles
 ├── static/                    # Files copied to /static/
 ├── markdown/                  # Posts and special pages
-│   ├── welcome-to-aonote.md
-│   ├── markdown-basics.md
-│   ├── nojs-compliance-fixes.md
-│   ├── blog-ui-ux-refactor.md
-│   ├── code-and-media-examples.md
-│   ├── tables-and-nojs-components.md
+│   ├── welcome-to-aonote.md   # Official homepage (replace after fork)
+│   ├── doc-quickstart.md      # Project docs (optional delete)
+│   ├── doc-why-no-js.md
+│   ├── markdown-basics.md     # Syntax preview (optional)
 │   ├── 404.md
 │   └── about.md
 ├── templates/

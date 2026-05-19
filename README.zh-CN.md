@@ -4,7 +4,7 @@
 
 Aonote 青笺是一个用 Python 编写的极简静态博客生成器。它把 `markdown/` 中的文章转换为纯 HTML/CSS 页面，不依赖前端框架，也不需要浏览器执行 JavaScript。
 
-在线演示：[aonote.vercel.app](https://aonote.vercel.app)
+**官方网站（兼在线演示）：** [aonote.vercel.app](https://aonote.vercel.app) · 作者 [Runsli](https://www.runsli.com/)
 
 ## 功能概览
 
@@ -25,7 +25,7 @@ Aonote 青笺的定位是一个偏文档、偏博客的 no-JS 静态站生成器
 - 支持 Pygments 代码高亮、代码块语言识别、代码块标题、指定行高亮和长代码行横向滚动。
 - 支持 `diff` / `patch` 代码块的加减行高亮，并为新增行、删除行补充屏幕阅读器标签。
 - 支持表格标题语法，例如 `表格：示例说明`，构建时会生成语义化 `<caption>`。
-- 示例文档已按主题拆分为基础排版、代码与媒体、表格与 no-JS 组件，便于查看实际渲染效果。
+- 官网提供项目文档（`doc-*.md`）与一篇 Markdown 排版示例，便于查看实际渲染效果。
 
 ### no-JS 与交互
 
@@ -121,6 +121,22 @@ python -m http.server 8000
 
 然后访问 `http://localhost:8000`。
 
+## Fork 后定制自己的站点
+
+本仓库默认的 `markdown/` 内容用于 **Aonote 官网**（项目介绍、文档与一篇排版示例）。Fork 后若要做个人博客，建议按下面步骤清理，通常半小时内可上线：
+
+1. 编辑 `config.py`：`BASE_URL`、`BLOG_TITLE`、`BLOG_DESCRIPTION`、`BLOG_AUTHOR`。
+2. 用你自己的介绍替换 `markdown/welcome-to-aonote.md`（首页最新文章）。
+3. 改写 `markdown/about.md`（关于页，保持 `hidden: true`）。
+4. **删除** 不需要的项目文档（可选）：
+   - `markdown/doc-quickstart.md`
+   - `markdown/doc-why-no-js.md`
+5. **删除** 不需要的示例（可选）：
+   - `markdown/markdown-basics.md`
+6. 运行 `python autobuild.py`，部署 `_site/`。
+
+保留 `doc-*.md` 或 `markdown-basics.md` 不影响构建，只是首页与归档会多几篇官方向文章。
+
 ## 目录结构
 
 ```text
@@ -129,12 +145,10 @@ Aonote/
 │   └── style.css              # 站点样式
 ├── static/                    # 直接复制到站点根路径 /static/ 的静态资源
 ├── markdown/                  # Markdown 文章和特殊页面
-│   ├── welcome-to-aonote.md
-│   ├── markdown-basics.md
-│   ├── nojs-compliance-fixes.md
-│   ├── blog-ui-ux-refactor.md
-│   ├── code-and-media-examples.md
-│   ├── tables-and-nojs-components.md
+│   ├── welcome-to-aonote.md   # 官网首页文（Fork 后请替换）
+│   ├── doc-quickstart.md      # 项目文档（Fork 后可删）
+│   ├── doc-why-no-js.md
+│   ├── markdown-basics.md     # 排版示例（可选保留）
 │   ├── 404.md
 │   └── about.md
 ├── templates/

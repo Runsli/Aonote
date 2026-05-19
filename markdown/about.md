@@ -1,50 +1,43 @@
 ---
 title: 关于 Aonote 青笺
-date: 2025-12-01
-summary: 介绍 Aonote 青笺作为 no-JS 静态博客模板的设计原则、功能边界和自定义方式。
-hidden: true  # 增加一个自定义字段，用于标记该文件不应被常规博客流程处理
+date: 2026-05-20
+summary: Aonote 青笺的设计原则、功能边界、作者信息与仓库链接。
+hidden: true
 ---
 
 # 关于 Aonote 青笺
 
-Aonote 青笺是一个用 Python 编写的 no-JS 静态博客模板。它关注的是内容站最基础也最重要的部分：稳定的页面结构、清晰的阅读体验、可维护的 Markdown 内容，以及可以直接部署的静态产物。
+Aonote 青笺是一个面向个人博客、技术笔记与轻量文档站的 **no-JS 静态站生成器**。它关注内容长期可读、页面结构清晰、构建产物易于部署，并在不依赖浏览器端 JavaScript 的前提下保留足够的阅读与无障碍体验。
 
 ## 设计原则
 
-这个模板围绕几个原则构建：
+- **内容优先**：布局服务于标题、正文、代码与表格，而不是炫技式交互。
+- **纯静态输出**：构建结果是 HTML、CSS 与静态资源；关键体验不绑定客户端脚本。
+- **构建期增强**：高亮、公式、目录、订阅源与大部分 SEO 在 Python 构建阶段完成。
+- **默认可检查**：`autobuild.py` 结束后运行 `check_site.py`，覆盖链接、no-JS、无障碍与 Feeds。
+- **容易迁移**：文章在 Markdown，样式在 CSS，无 lock-in 式前端运行时。
 
-- **内容优先**：页面布局尽量减少干扰，让标题、正文、代码块、表格和脚注保持清楚的阅读层级。
-- **纯静态输出**：构建结果是 HTML、CSS 和静态资源，不需要浏览器端 JavaScript 才能阅读主要内容。
-- **长期可维护**：文章使用 Markdown 管理，模板、样式、配置和构建逻辑各自独立，方便逐步调整。
-- **默认可检查**：构建后自动检查站内链接、基础 SEO、RSS/Atom、无障碍细节和 no-JS 约束。
-- **容易部署**：输出目录 `_site/` 可以直接发布到常见静态托管平台。
+## 作者
 
-## 内置能力
+本站由 [Runsli](https://www.runsli.com/) 创建并维护。个人博客记录学习、项目与对极简 Web 的实践；Aonote 是其中一个开源项目。
 
-Aonote 青笺默认提供：
+- 个人站：[www.runsli.com](https://www.runsli.com/)
+- 项目仓库：[github.com/Runsli/Aonote](https://github.com/Runsli/Aonote)
 
-- 首页、文章、归档、标签、关于页和 404 页面生成。
-- RSS、Atom、Sitemap、robots.txt 和常见分享元信息。
-- Markdown 扩展支持，包括代码高亮、目录、表格、脚注、任务列表、提示块、删除线、Emoji 和数学公式。
-- 浅色/暗色模式、移动端导航、可见键盘焦点和响应式阅读布局。
-- 表格、代码块、任务列表、脚注和 diff 代码块的无障碍增强。
+欢迎通过 GitHub Issue 反馈问题或提交 Pull Request。
 
-## 适合的使用方式
+## 许可
 
-你可以把它作为：
+项目源码遵循仓库中的 [LICENSE](https://github.com/Runsli/Aonote/blob/main/LICENSE)。本站文章默认采用 CC BY-NC-SA 4.0（见各文末尾版权块）。
 
-- 个人博客模板。
-- 技术笔记或知识库模板。
-- 项目主页或轻量文档站模板。
-- no-JS 静态站实践样板。
+## Fork 做自己的站
 
-如果你正在把它改成自己的站点，建议优先更新 `config.py`、`README.md`、`markdown/about.md` 和首页欢迎文章，再根据内容气质调整配色和排版。
+本仓库默认 `markdown/` 内容面向 **Aonote 官网**。若你 Fork 后想改成个人博客，通常只需：
 
-## 自定义建议
+1. 修改 `config.py` 中的站点信息与 `BASE_URL`。
+2. 替换 `welcome-to-aonote.md` 与 `about.md`。
+3. 删除以 `doc-` 开头的项目文档（若不需要）。
+4. 保留或删除 `markdown-basics.md` 等示例文。
+5. 运行 `python autobuild.py` 并部署 `_site/`。
 
-- 修改 `BLOG_TITLE`、`BLOG_DESCRIPTION`、`BLOG_AUTHOR` 和 `BASE_URL`。
-- 替换示例文章，保留需要的 Markdown 语法示例。
-- 根据自己的域名和部署平台检查 `vercel.json` 或 `netlify.toml`。
-- 构建前后运行 `python autobuild.py` 和 `python check_site.py`，确认链接、订阅源和无障碍检查都通过。
-
-Aonote 青笺只是一个起点。真正重要的是你放进来的内容，以及它能否在几年后仍然容易阅读、容易迁移、容易维护。
+详细说明见 [README · Fork 后定制](https://github.com/Runsli/Aonote/blob/main/README.zh-CN.md#fork-后定制自己的站点)。

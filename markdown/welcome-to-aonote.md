@@ -1,53 +1,58 @@
 ---
-title: 欢迎来到 Aonote 青笺
-date: 2025-12-01
-summary: 介绍 Aonote 青笺作为 no-JS 静态博客模板的定位、核心能力、适用场景和开始使用方式。
-tags: [建站日志]
+title: Aonote 青笺
+date: 2026-05-20
+summary: 用 Python 将 Markdown 生成为纯 HTML/CSS 的 no-JS 静态博客生成器。本站即官方站点与可运行演示。
+tags: [项目]
 ---
 
-# 欢迎来到 Aonote 青笺
+# Aonote 青笺
 
-**Aonote 青笺** 是一个面向个人博客、技术笔记和轻量文档站的 no-JS 静态网站模板。它使用 Python 将 Markdown 内容生成纯 HTML/CSS 页面，适合部署到 Vercel、Netlify、GitHub Pages 或任意静态托管平台。
+**Aonote 青笺** 是一个用 Python 编写的 no-JS 静态博客生成器。它把 `markdown/` 里的文章转成可直接部署的 HTML/CSS 页面：不依赖前端框架，也不要求浏览器执行 JavaScript。
 
-这个模板的目标不是做成一个功能繁复的 Web App，而是提供一个干净、稳定、可长期维护的写作起点：内容放在 Markdown 里，样式集中在 CSS 里，构建结果就是可以直接发布的静态文件。
+本站 [aonote.vercel.app](https://aonote.vercel.app) 同时承担 **项目官网** 与 **在线演示**——你正在阅读的页面，就是用它自己构建出来的。
 
-## 适合什么场景
+## 为什么做它
 
-Aonote 青笺适合这些用途：
+- **内容站应该是文档，不是 Web App**：阅读、订阅、搜索索引不应绑定客户端运行时。
+- **构建期完成重活**：代码高亮、数学公式（MathML）、目录与 SEO 元信息在构建时生成。
+- **默认可检查**：`check_site.py` 在构建后检查链接、no-JS、无障碍与订阅源，减少上线后的隐性问题。
 
-- 个人博客：记录学习、项目、阅读和长期思考。
-- 技术笔记：整理代码片段、问题复盘、工具配置和实践经验。
-- 项目文档：发布轻量说明、版本记录、使用指南和设计决策。
-- no-JS 实验站：验证纯 HTML/CSS 在现代博客中的可用性。
+## 快速开始
 
-如果你希望站点打开快、依赖少、容易迁移，并且不想为一个内容站维护复杂的前端运行时，它会是一个轻量的起点。
+```bash
+git clone https://github.com/Runsli/Aonote.git
+cd Aonote
+pip install -r requirements.txt
+```
 
-## 模板已经准备了什么
+编辑 `config.py` 中的 `BASE_URL`、`BLOG_TITLE`、`BLOG_AUTHOR`，替换 `markdown/` 里的欢迎文与关于页，然后：
 
-默认配置已经包含常见博客需要的基础能力：
+```bash
+python autobuild.py
+cd _site && python -m http.server 8000
+```
 
-- 首页、文章页、归档页、标签页、关于页和真实 404 页面。
-- Markdown 目录、代码高亮、表格、脚注、任务列表、提示块和数学公式。
-- RSS、Atom、Sitemap、canonical、Open Graph 和 Twitter Card。
-- 浅色/暗色模式、移动端导航、键盘焦点样式和锚点滚动优化。
-- 构建后健康检查，用来发现链接、SEO、无障碍和 no-JS 方面的问题。
+更完整的步骤见 [快速开始](/posts/doc-quickstart/)。
 
-这些功能都围绕一个原则设计：让内容站保持静态、可读、可部署，而不是依赖浏览器端脚本补齐关键体验。
+## 核心能力
 
-## 如何开始使用
+- 首页、文章、归档、标签、关于页与真实 404。
+- Markdown 扩展：代码高亮、目录、表格、脚注、任务列表、提示块、数学公式等。
+- RSS、Atom、Sitemap、Open Graph；结构化数据使用 Microdata，无 JSON-LD `<script>`。
+- 浅色/暗色模式、移动端导航、键盘焦点与 `prefers-reduced-motion`。
+- 增量构建与构建后健康检查。
 
-使用时通常只需要做几件事：
+## 链接
 
-1. 修改 `config.py` 中的站点名称、描述、作者和线上域名。
-2. 在 `markdown/` 中新增或替换文章，文件名建议使用小写 kebab-case。
-3. 根据自己的品牌调整 `assets/style.css` 中的颜色、字体和间距。
-4. 运行 `python autobuild.py` 构建站点，并检查 `_site/` 输出。
-5. 将 `_site/` 部署到静态托管平台。
+- **源码与 Issue**：[github.com/Runsli/Aonote](https://github.com/Runsli/Aonote)
+- **作者**：[Runsli 的小站](https://www.runsli.com/)
+- **关于本项目**：[关于页](/about/)
+- **Markdown 渲染预览**：[Markdown 排版示例](/posts/markdown-basics/)
 
-如果要把它改成自己的站点，建议先替换这篇欢迎文章和 `about.md`，再逐步调整样式和示例内容。
+## 命名
 
-## 命名与风格
+`Aonote` 保留 note（笔记）的含义；中文名 **青笺** 强调纸页与安静书写。少一点运行时，多一点内容本身。
 
-`Aonote` 是一个偏轻量的造词，保留了 note 的笔记含义；中文名“青笺”更强调纸页、写作和安静记录的感觉。作为模板名称，它想传达的是一种克制的方向：少一点运行时，多一点内容本身。
+---
 
-你可以保留这套命名，也可以把它替换成自己的品牌。模板本身没有绑定特定作者身份，适合继续改造成个人站、团队文档或项目主页。
+若你 Fork 本仓库做自己的博客，请阅读仓库 [README](https://github.com/Runsli/Aonote/blob/main/README.zh-CN.md#fork-后定制自己的站点) 中的「Fork 后定制」一节。

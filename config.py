@@ -40,10 +40,10 @@ BLOG_TITLE = "Aonote 青笺"
 
 # 描述，通常作为描述信息在搜索引擎的结果页面或者社交链接分享的时候链接中显示
 # Site description used in search results and social sharing metadata.
-BLOG_DESCRIPTION = "一处记录数据科学、极简主义与纯粹 Web 技术的静态笔记。"
+BLOG_DESCRIPTION = "用 Python 编写的 no-JS 静态博客生成器：Markdown 进，纯 HTML/CSS 出，无需浏览器端 JavaScript。"
 # 作者，主要作用于网站页脚的位置进行显示
 # Author name shown in the footer and feed metadata.
-BLOG_AUTHOR = "Aonote"
+BLOG_AUTHOR = "Runsli"
 
 # 站点界面语言。可选值参考 i18n.py，例如 "zh-CN" 或 "en"。
 # UI language for fixed template strings. See i18n.py. Supported: "zh-CN", "en".
@@ -63,8 +63,8 @@ CODE_HIGHLIGHT_CLASS = 'highlight'
 
 # 页脚内容配置 - 可选值: 'build_time', 'empty', 'custom'
 # Footer content type: build timestamp, empty, or custom text.
-FOOTER_CONTENT_TYPE = 'build_time'  # 默认显示构建时间 / Show build time by default
-FOOTER_CUSTOM_TEXT = 'Powered by Aonote'  # 自定义文本内容 / Custom footer text
+FOOTER_CONTENT_TYPE = 'custom'  # 默认显示构建时间 / Show build time by default
+FOOTER_CUSTOM_TEXT = 'Aonote 青笺 · no-JS 静态站'  # 自定义文本内容 / Custom footer text
 
 # config.py 中添加完整的版权配置 / Copyright notice configuration
 # --- 版权声明配置 / Copyright license settings ---

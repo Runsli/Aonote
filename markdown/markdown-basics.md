@@ -1,9 +1,11 @@
 ---
-title: Markdown 基础排版示例
+title: Markdown 排版示例
 date: 2026-01-10
-summary: 展示标题、段落、行内文本、链接、数学公式、列表、引用、脚注与中英文混排等 Markdown 基础能力。
-tags: [basic, markdown]
+summary: Aonote 官网保留的语法预览页：标题、列表、链接、公式、脚注与中英文混排等基础排版效果。
+tags: [示例]
 ---
+
+本站保留此页作为 **Markdown 渲染预览**。Fork 后若不需要可删除本文件。
 
 这个页面聚焦 Markdown 基础排版能力：标题、段落、行内文本、链接、数学公式、列表、引用、脚注和混排文本。
 
