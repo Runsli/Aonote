@@ -10,6 +10,12 @@ Aonote 青笺是一个用 Python 编写的极简静态博客生成器。它把 `
 
 需要 **no-JS、Python 构建** 时用本仓库；需要 **同款 UI、Astro 生态、可选 JS** 时用 [astro-theme-aonote](https://github.com/runsli/astro-theme-aonote)（[演示站](https://astro-theme-aonote.vercel.app)）。二者内容模型与样式对齐，可视为同一品牌的两种实现。
 
+## 预览
+
+| 桌面端 | 移动端 |
+| --- | --- |
+| ![Aonote 首页（桌面）](docs/screenshots/home-desktop.png) | ![Aonote 首页（移动）](docs/screenshots/home-mobile.png) |
+
 ## 功能概览
 
 Aonote 青笺的定位是一个偏文档、偏博客的 no-JS 静态站生成器。它关注内容长期可读、页面结构清晰、构建结果容易部署，以及在不依赖浏览器端 JavaScript 的前提下保留足够好的阅读体验。

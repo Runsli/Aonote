@@ -45,7 +45,7 @@ BLOG_DESCRIPTION = "用 Python 编写的 no-JS 静态博客生成器：Markdown 
 # Author name shown in the footer and feed metadata.
 BLOG_AUTHOR = "Runsli"
 
-# 首页可见标题与副标题（浏览器标签与首页主标题）/ Homepage visible title and subtitle
+# 首页浏览器标签与分享标题（不在页面正文中显示）/ Homepage <title> and social cards only
 INDEX_PAGE_TITLE = "Aonote 青笺"
 INDEX_PAGE_SUBTITLE = "no-JS 静态博客生成器"
 

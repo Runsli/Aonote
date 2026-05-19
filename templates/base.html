@@ -102,23 +102,13 @@
                     {% endif %}
 
                     {%- endif -%}
-                    {%- if page_id != 'post' and page_id != 'tag' and page_id != 'tags' and page_id != 'feed' and page_id != 'index' -%}
+                    {%- if page_id != 'post' and page_id != 'tag' and page_id != 'tags' and page_id != 'feed' -%}
                     <h1 class="visually-hidden">{{page_title}}</h1>
                     {%- endif -%}
                 </div>
 
                 {# --- 列表页面 (首页, 标签详情, 归档) / List pages: home, tag, archive --- #}
                 {%- if page_id == 'index' or page_id == 'tag' or page_id == 'archive' -%}
-
-                {%- if page_id == 'index' -%}
-                <div class="index-intro">
-                    <h1 class="page-list-title">{{ index_page_title }}</h1>
-                    {%- if index_page_subtitle -%}
-                    <p class="index-subtitle">{{ index_page_subtitle }}</p>
-                    {%- endif -%}
-                </div>
-                <hr class="section-divider">
-                {%- endif -%}
 
                 {%- if page_id == 'tag' -%}
                 <div class="tag-meta-info">

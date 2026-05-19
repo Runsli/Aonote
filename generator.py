@@ -312,10 +312,9 @@ def generate_index_html(sorted_posts: List[Dict[str, Any]], build_time_info: str
         visible_posts = [p for p in sorted_posts if not is_post_hidden(p)][:config.MAX_POSTS_ON_INDEX]
 
         template = env.get_template('base.html')
-        index_title = getattr(config, 'INDEX_PAGE_TITLE', '') or config.BLOG_TITLE
         context = {
             'page_id': 'index',
-            'page_title': index_title,
+            'page_title': i18n['page_home'],
             'blog_title': config.BLOG_TITLE,
             'blog_description': config.BLOG_DESCRIPTION,
             'blog_author': config.BLOG_AUTHOR,
