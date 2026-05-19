@@ -195,6 +195,35 @@ Resolve a Markdown ``img`` ``src`` to a local filesystem path relative to the pr
     return candidate if os.path.isfile(candidate) else None
 
 
+_FENCE_OPENING_RE = re.compile(r'^(\s*)(`{3,}|~{3,})([^\n]*)$')
+
+
+def _track_fence_line(line: str, state: Dict[str, Any]) -> None:
+    """Update fenced-code state for nested backtick/tilde fences."""
+    match = _FENCE_OPENING_RE.match(line)
+    if not match:
+        return
+
+    fence = match.group(2)
+    info = match.group(3).strip()
+    marker = fence[0]
+
+    if not state['in_fence']:
+        state['in_fence'] = True
+        state['marker'] = marker
+        state['len'] = len(fence)
+        return
+
+    if marker == state['marker'] and len(fence) >= state['len'] and not info:
+        state['in_fence'] = False
+        state['marker'] = ''
+        state['len'] = 0
+
+
+def _should_skip_admonition_rewrite(line: str, inside_fence: bool) -> bool:
+    return inside_fence or bool(_FENCE_OPENING_RE.match(line))
+
+
 def _convert_colon_admonitions(markdown_text: str) -> str:
     """将 VuePress / VitePress 风格的 ``::: type`` 围栏提示块改写为兼容 Python Markdown 的 ``!!!`` 语法。
 
@@ -204,12 +233,21 @@ Normalize colon-fenced VuePress/VitePress admonitions (``::: tip`` / ``::: note`
     close_re = re.compile(r'^\s*:{3,}\s*$')
     lines = markdown_text.splitlines()
     converted = []
+    fence_state = {'in_fence': False, 'marker': '', 'len': 0}
     i = 0
 
     while i < len(lines):
-        start_match = fence_re.match(lines[i])
-        if not start_match or close_re.match(lines[i]):
-            converted.append(lines[i])
+        line = lines[i]
+        inside_fence = fence_state['in_fence']
+        _track_fence_line(line, fence_state)
+        if _should_skip_admonition_rewrite(line, inside_fence):
+            converted.append(line)
+            i += 1
+            continue
+
+        start_match = fence_re.match(line)
+        if not start_match or close_re.match(line):
+            converted.append(line)
             i += 1
             continue
 
