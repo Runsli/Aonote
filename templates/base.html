@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{page_title}} - {{blog_title}}</title>
+    <title>{% if page_id == 'index' %}{{ index_page_title }}{% if index_page_subtitle %} — {{ index_page_subtitle }}{% endif %}{% else %}{{ page_title }} - {{ blog_title }}{% endif %}</title>
     <meta name="description" content="{{blog_description}}">
     <meta name="author" content="{{blog_author}}">
     <meta name="color-scheme" content="light dark">
@@ -16,7 +16,7 @@
     <link rel="canonical" href="{{canonical_url}}">
     {% endif %}
     <meta property="og:type" content="{% if page_id == 'post' %}article{% else %}website{% endif %}">
-    <meta property="og:title" content="{{page_title}} - {{blog_title}}">
+    <meta property="og:title" content="{% if page_id == 'index' %}{{ index_page_title }}{% if index_page_subtitle %} — {{ index_page_subtitle }}{% endif %}{% else %}{{ page_title }} - {{ blog_title }}{% endif %}">
     <meta property="og:description" content="{{blog_description}}">
     <meta property="og:url" content="{{canonical_url}}">
     <meta property="og:site_name" content="{{blog_title}}">
@@ -25,7 +25,7 @@
     <meta property="article:modified_time" content="{{post_date_iso}}">
     {% endif %}
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="{{page_title}} - {{blog_title}}">
+    <meta name="twitter:title" content="{% if page_id == 'index' %}{{ index_page_title }}{% if index_page_subtitle %} — {{ index_page_subtitle }}{% endif %}{% else %}{{ page_title }} - {{ blog_title }}{% endif %}">
     <meta name="twitter:description" content="{{blog_description}}">
     <link rel="stylesheet" href="{{site_root}}/assets/{{css_filename}}">
     <link rel="alternate" type="application/rss+xml" title="{{blog_title}} RSS Feed" href="{{site_root}}/rss.xml">
@@ -102,13 +102,23 @@
                     {% endif %}
 
                     {%- endif -%}
-                    {%- if page_id != 'post' and page_id != 'tag' and page_id != 'tags' and page_id != 'feed' -%}
+                    {%- if page_id != 'post' and page_id != 'tag' and page_id != 'tags' and page_id != 'feed' and page_id != 'index' -%}
                     <h1 class="visually-hidden">{{page_title}}</h1>
                     {%- endif -%}
                 </div>
 
                 {# --- 列表页面 (首页, 标签详情, 归档) / List pages: home, tag, archive --- #}
                 {%- if page_id == 'index' or page_id == 'tag' or page_id == 'archive' -%}
+
+                {%- if page_id == 'index' -%}
+                <div class="index-intro">
+                    <h1 class="page-list-title">{{ index_page_title }}</h1>
+                    {%- if index_page_subtitle -%}
+                    <p class="index-subtitle">{{ index_page_subtitle }}</p>
+                    {%- endif -%}
+                </div>
+                <hr class="section-divider">
+                {%- endif -%}
 
                 {%- if page_id == 'tag' -%}
                 <div class="tag-meta-info">
@@ -289,8 +299,16 @@
         <div class="footer-content">
             <div class="footer-left">
                 <span class="copyright-info">&copy; {{current_year}} {{blog_author}}.</span>
+                {%- if footer_content_type == 'custom' and footer_custom_text -%}
+                <span class="footer-meta">{{ footer_custom_text }}</span>
+                {%- elif footer_content_type == 'build_time' and footer_time_info -%}
+                <span class="build-info">{{ footer_time_info }}</span>
+                {%- endif -%}
             </div>
-            <div class="footer-right">
+            <div class="footer-right footer-links">
+                {%- if github_repo_url -%}
+                <a href="{{ github_repo_url }}" rel="noopener noreferrer">{{ i18n.footer_github }}</a>
+                {%- endif -%}
                 <a href="{{site_root}}/feed/">{{i18n.rss_subscribe}}</a>
                 <a href="#main-content" class="back-to-top">{{i18n.back_to_top}}</a>
             </div>

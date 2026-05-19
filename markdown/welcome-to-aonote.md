@@ -47,6 +47,7 @@ cd _site && python -m http.server 8000
 - **源码与 Issue**：[github.com/Runsli/Aonote](https://github.com/Runsli/Aonote)
 - **作者**：[Runsli 的小站](https://www.runsli.com/)
 - **关于本项目**：[关于页](/about/)
+- **更新日志**：[changelog](/posts/doc-changelog/)
 - **Markdown 渲染预览**：[Markdown 排版示例](/posts/markdown-basics/)
 
 ## 命名

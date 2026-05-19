@@ -45,6 +45,13 @@ BLOG_DESCRIPTION = "用 Python 编写的 no-JS 静态博客生成器：Markdown 
 # Author name shown in the footer and feed metadata.
 BLOG_AUTHOR = "Runsli"
 
+# 首页可见标题与副标题（浏览器标签与首页主标题）/ Homepage visible title and subtitle
+INDEX_PAGE_TITLE = "Aonote 青笺"
+INDEX_PAGE_SUBTITLE = "no-JS 静态博客生成器"
+
+# 页脚 GitHub 仓库链接，留空则不显示 / GitHub repo URL in footer; empty to hide
+GITHUB_REPO_URL = "https://github.com/Runsli/Aonote"
+
 # 站点界面语言。可选值参考 i18n.py，例如 "zh-CN" 或 "en"。
 # UI language for fixed template strings. See i18n.py. Supported: "zh-CN", "en".
 SITE_LANGUAGE = "zh-CN"

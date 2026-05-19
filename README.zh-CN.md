@@ -131,6 +131,7 @@ python -m http.server 8000
 4. **删除** 不需要的项目文档（可选）：
    - `markdown/doc-quickstart.md`
    - `markdown/doc-why-no-js.md`
+   - `markdown/doc-changelog.md`
 5. **删除** 不需要的示例（可选）：
    - `markdown/markdown-basics.md`
 6. 运行 `python autobuild.py`，部署 `_site/`。
@@ -148,6 +149,7 @@ Aonote/
 │   ├── welcome-to-aonote.md   # 官网首页文（Fork 后请替换）
 │   ├── doc-quickstart.md      # 项目文档（Fork 后可删）
 │   ├── doc-why-no-js.md
+│   ├── doc-changelog.md
 │   ├── markdown-basics.md     # 排版示例（可选保留）
 │   ├── 404.md
 │   └── about.md

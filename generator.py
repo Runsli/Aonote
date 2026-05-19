@@ -62,11 +62,23 @@ def get_i18n() -> Dict[str, Any]:
     return get_translations(getattr(config, 'SITE_LANGUAGE', 'zh-CN'))
 
 
+def get_common_template_context() -> Dict[str, Any]:
+    """Site-wide template variables injected into every page render."""
+    return {
+        'index_page_title': getattr(config, 'INDEX_PAGE_TITLE', '') or config.BLOG_TITLE,
+        'index_page_subtitle': getattr(config, 'INDEX_PAGE_SUBTITLE', ''),
+        'github_repo_url': getattr(config, 'GITHUB_REPO_URL', '').strip(),
+        'footer_content_type': config.FOOTER_CONTENT_TYPE,
+        'footer_custom_text': config.FOOTER_CUSTOM_TEXT,
+    }
+
+
 def render_template(template, context: Dict[str, Any]) -> str:
     i18n = get_i18n()
     template_context = {
         'i18n': i18n,
         'site_language': i18n.get('html_lang', 'zh-cn'),
+        **get_common_template_context(),
         **context,
     }
     return template.render(template_context)
@@ -300,9 +312,10 @@ def generate_index_html(sorted_posts: List[Dict[str, Any]], build_time_info: str
         visible_posts = [p for p in sorted_posts if not is_post_hidden(p)][:config.MAX_POSTS_ON_INDEX]
 
         template = env.get_template('base.html')
+        index_title = getattr(config, 'INDEX_PAGE_TITLE', '') or config.BLOG_TITLE
         context = {
             'page_id': 'index',
-            'page_title': i18n['page_home'],
+            'page_title': index_title,
             'blog_title': config.BLOG_TITLE,
             'blog_description': config.BLOG_DESCRIPTION,
             'blog_author': config.BLOG_AUTHOR,
