@@ -70,8 +70,8 @@ CODE_HIGHLIGHT_CLASS = 'highlight'
 
 # 页脚内容配置 - 可选值: 'build_time', 'empty', 'custom'
 # Footer content type: build timestamp, empty, or custom text.
-FOOTER_CONTENT_TYPE = 'custom'  # 默认显示构建时间 / Show build time by default
-FOOTER_CUSTOM_TEXT = 'Aonote 青笺 · no-JS 静态站'  # 自定义文本内容 / Custom footer text
+FOOTER_CONTENT_TYPE = 'empty'  # 页脚左侧仅版权；可选 build_time / custom / Custom footer left extras
+FOOTER_CUSTOM_TEXT = ''  # 自定义文本内容 / Custom footer text
 
 # config.py 中添加完整的版权配置 / Copyright notice configuration
 # --- 版权声明配置 / Copyright license settings ---
